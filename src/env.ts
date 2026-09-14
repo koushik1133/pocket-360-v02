@@ -54,6 +54,11 @@ const schema = z.object({
     .string()
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
+  ANTHROPIC_API_KEY: z
+    .string()
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : undefined)),
+  ASSISTANT_MODEL: z.string().min(1).default("claude-opus-5"),
   APPOINTMENT_FROM_EMAIL: optionalEmail,
   APPOINTMENT_NOTIFY_EMAIL: optionalEmail,
   APPOINTMENT_FROM_NAME: z.string().min(1).default("Pocket Reels 360"),
@@ -78,6 +83,8 @@ const parsed = schema.safeParse({
   DATABASE_URL: blankToUndefined(process.env.DATABASE_URL),
   ALLOW_FILE_APPOINTMENTS: blankToUndefined(process.env.ALLOW_FILE_APPOINTMENTS),
   RESEND_API_KEY: blankToUndefined(process.env.RESEND_API_KEY),
+  ANTHROPIC_API_KEY: blankToUndefined(process.env.ANTHROPIC_API_KEY),
+  ASSISTANT_MODEL: blankToUndefined(process.env.ASSISTANT_MODEL),
   APPOINTMENT_FROM_EMAIL: blankToUndefined(process.env.APPOINTMENT_FROM_EMAIL),
   APPOINTMENT_NOTIFY_EMAIL: blankToUndefined(
     process.env.APPOINTMENT_NOTIFY_EMAIL,

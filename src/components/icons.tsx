@@ -151,3 +151,47 @@ export function MapPinIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function SparklesIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z" />
+      <path d="M18 14l.8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8L18 14Z" />
+    </svg>
+  );
+}
+
+export function MicIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+    </svg>
+  );
+}
+
+export function SoundOnIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a9 9 0 0 1 0 12" />
+    </svg>
+  );
+}
+
+export function SoundOffIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M11 5 6 9H3v6h3l5 4V5Z" />
+      <path d="m16 9 5 6M21 9l-5 6" />
+    </svg>
+  );
+}
+
+export function PhoneIcon(props: IconProps) {
+  return (
+    <svg {...iconProps(props)}>
+      <path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 18l5 2v-4a13 13 0 0 1-12-12Z" />
+    </svg>
+  );
+}

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { brand } from "@/content/site";
 import { env } from "@/env";
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
 import { MobileActionBar } from "@/components/mobile-action-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -95,6 +96,11 @@ export default function RootLayout({
         <main id="main-content">{children}</main>
         <SiteFooter {...contact} />
         <MobileActionBar whatsappNumber={contact.whatsappNumber} />
+        <AssistantWidget
+          whatsappNumber={contact.whatsappNumber}
+          contactEmail={contact.contactEmail}
+          contactPhone={contact.contactPhone}
+        />
         <SiteMotion />
         <script
           type="application/ld+json"
