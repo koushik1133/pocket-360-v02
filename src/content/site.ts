@@ -27,7 +27,7 @@ export const reelProcess = [
     description:
       "Pocket Reels captures vertical footage where the moment is happening.",
     image: "/media/reel-kiran-dallas.jpg",
-    alt: "Temporary placeholder for a colorful night event reel"
+    alt: "Temporary placeholder for a colorful night event reel",
   },
   {
     index: "02",
@@ -36,7 +36,7 @@ export const reelProcess = [
     description:
       "Captured moments are shaped into concise, pace-led social reels.",
     image: "/media/reel-anirudh.jpg",
-    alt: "Temporary placeholder for a concert lighting reel"
+    alt: "Temporary placeholder for a concert lighting reel",
   },
   {
     index: "03",
@@ -45,7 +45,7 @@ export const reelProcess = [
     description:
       "A finished reel, delivered by the same crew that followed the story.",
     image: "/media/reel-henna.jpg",
-    alt: "Temporary placeholder for a jewelry still-life reel"
+    alt: "Temporary placeholder for a jewelry still-life reel",
   },
 ] as const;
 
@@ -71,7 +71,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Live from the stage",
     category: "Live & events",
     image: "/media/reel-concert-aug28.jpg",
-    alt: "Temporary placeholder for a live stage reel"
+    alt: "Temporary placeholder for a live stage reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DcnRv6bJNs6/",
     featured: true,
@@ -81,7 +81,7 @@ export const workItems: readonly WorkItem[] = [
     title: "A moment at ATA",
     category: "Live & events",
     image: "/media/reel-ata.jpg",
-    alt: "Temporary placeholder for an event hall reel"
+    alt: "Temporary placeholder for an event hall reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DbBgeuoJUE4/",
   },
@@ -90,7 +90,7 @@ export const workItems: readonly WorkItem[] = [
     title: "In the details",
     category: "Portrait moments",
     image: "/media/reel-henna.jpg",
-    alt: "Temporary placeholder for a portrait-moment reel"
+    alt: "Temporary placeholder for a portrait-moment reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DdK0Knbuab6/",
   },
@@ -99,7 +99,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Thank you, Dallas",
     category: "Live & events",
     image: "/media/reel-kiran-dallas.jpg",
-    alt: "Temporary placeholder for a Dallas night event reel"
+    alt: "Temporary placeholder for a Dallas night event reel",
     instagramUrl: "https://www.instagram.com/kiranvocals/reel/DdNyEW4NYIN/",
   },
   {
@@ -107,7 +107,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Aurum arrival",
     category: "Brands",
     image: "/media/reel-real-estate.jpg",
-    alt: "Temporary placeholder for a real-estate interior reel"
+    alt: "Temporary placeholder for a real-estate interior reel",
     instagramUrl:
       "https://www.instagram.com/theaurumreality/reel/DdLPGYMoWY8/",
   },
@@ -116,7 +116,7 @@ export const workItems: readonly WorkItem[] = [
     title: "The Wealth Room",
     category: "Brands",
     image: "/media/reel-aurum.jpg",
-    alt: "Temporary placeholder for a luxury venue reel"
+    alt: "Temporary placeholder for a luxury venue reel",
     instagramUrl:
       "https://www.instagram.com/theaurumreality/reel/DdKuS7FCbdU/",
   },
@@ -125,7 +125,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Signature India Grocery",
     category: "Brands",
     image: "/media/reel-grocery.jpg",
-    alt: "Temporary placeholder for a grocery brand reel"
+    alt: "Temporary placeholder for a grocery brand reel",
     instagramUrl:
       "https://www.instagram.com/signatureindiagrocery/reel/DdFrlyVizu3/",
   },
@@ -134,7 +134,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Back in Jersey",
     category: "Live & events",
     image: "/media/reel-jersey.jpg",
-    alt: "Temporary placeholder for a live music stage reel"
+    alt: "Temporary placeholder for a live music stage reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DdFqDc4Og6l/",
   },
@@ -143,7 +143,7 @@ export const workItems: readonly WorkItem[] = [
     title: "The Hyderabad conversation",
     category: "Real estate",
     image: "/media/reel-hyderabad.jpg",
-    alt: "Temporary placeholder for an outdoor conversation reel"
+    alt: "Temporary placeholder for an outdoor conversation reel",
     instagramUrl:
       "https://www.instagram.com/sravanthi_prattipati/reel/Dc9RncYpCK8/",
   },
@@ -152,7 +152,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Mass Jathara",
     category: "Live & events",
     image: "/media/reel-paradise.jpg",
-    alt: "Temporary placeholder for a concert spotlight reel"
+    alt: "Temporary placeholder for a concert spotlight reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DcpSDiMO_AN/",
   },
@@ -161,7 +161,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Anirudh's Magic",
     category: "Live & events",
     image: "/media/reel-anirudh.jpg",
-    alt: "Temporary placeholder for a red concert lighting reel"
+    alt: "Temporary placeholder for a red concert lighting reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/Dc535GIptzb/",
   },
@@ -170,7 +170,7 @@ export const workItems: readonly WorkItem[] = [
     title: "Behind the moment",
     category: "Portrait moments",
     image: "/media/reel-shawl.jpg",
-    alt: "Temporary placeholder for a candid indoor reel"
+    alt: "Temporary placeholder for a candid indoor reel",
     instagramUrl:
       "https://www.instagram.com/pocketreels360/reel/DcPg9YDuG-O/",
   },
