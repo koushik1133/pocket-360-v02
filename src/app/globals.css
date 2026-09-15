@@ -8,9 +8,9 @@
   --color-surface: oklch(0.995 0.004 82);
   --color-muted: oklch(0.51 0.015 38);
   --color-line: oklch(0.86 0.012 68);
-  --color-accent: oklch(0.61 0.23 355);
-  --color-accent-dark: oklch(0.39 0.15 355);
-  --color-accent-soft: oklch(0.91 0.06 355);
+  --color-accent: oklch(0.57 0.22 26);
+  --color-accent-dark: oklch(0.40 0.16 26);
+  --color-accent-soft: oklch(0.93 0.04 26);
   --color-positive: oklch(0.58 0.13 155);
   --color-error: oklch(0.54 0.19 25);
   --color-white: oklch(0.99 0.002 82);
@@ -322,7 +322,7 @@ h3 {
 }
 
 .logo--light .logo-mark__dot {
-  fill: oklch(0.72 0.18 355);
+  fill: oklch(0.68 0.21 26);
 }
 
 .logo__wordmark {
@@ -346,7 +346,7 @@ h3 {
 }
 
 .logo--light .logo__wordmark b {
-  color: oklch(0.78 0.16 355);
+  color: oklch(0.74 0.18 26);
 }
 
 .desktop-nav {
@@ -3261,10 +3261,10 @@ h3 {
 @keyframes assistant-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 oklch(0.61 0.23 355 / 0.4);
+    box-shadow: 0 0 0 0 oklch(0.57 0.22 26 / 0.4);
   }
   50% {
-    box-shadow: 0 0 0 0.35rem oklch(0.61 0.23 355 / 0);
+    box-shadow: 0 0 0 0.35rem oklch(0.57 0.22 26 / 0);
   }
 }
 

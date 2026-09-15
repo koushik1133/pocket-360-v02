@@ -67,13 +67,13 @@ function emailShell(title: string, intro: string, record: AppointmentRecord) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#fffdf9;border-radius:18px;overflow:hidden">
             <tr>
               <td style="padding:30px 34px;background:#11100f;color:#fffaf2">
-                <div style="display:inline-block;border:1px solid #fffaf2;border-radius:999px;padding:7px 10px;color:#ff4d91;margin-right:10px">▶</div>
+                <div style="display:inline-block;border:1px solid #fffaf2;border-radius:999px;padding:7px 10px;color:#d92027;margin-right:10px">▶</div>
                 <strong style="font-size:14px;letter-spacing:2px">POCKET REELS 360</strong>
               </td>
             </tr>
             <tr>
               <td style="padding:40px 34px">
-                <p style="margin:0 0 12px;color:#a21b55;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase">Appointment</p>
+                <p style="margin:0 0 12px;color:#940111;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase">Appointment</p>
                 <h1 style="margin:0;font-size:34px;line-height:1.08;font-weight:600;letter-spacing:-1px">${escapeHtml(title)}</h1>
                 <p style="margin:18px 0 28px;color:#625d57;font-size:15px;line-height:1.65">${escapeHtml(intro)}</p>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">

@@ -25,7 +25,7 @@ export default function OpenGraphImage() {
             inset: "0 0 0 55%",
             display: "flex",
             background:
-              "radial-gradient(circle at 30% 45%, #d82b75 0, #5d1739 34%, #11100f 72%)",
+              "radial-gradient(circle at 30% 45%, #d92027 0, #6d0a0e 34%, #11100f 72%)",
             opacity: 0.82,
           }}
         />
@@ -57,7 +57,7 @@ export default function OpenGraphImage() {
                 justifyContent: "center",
                 border: "2px solid #fffaf2",
                 borderRadius: 999,
-                color: "#ff5697",
+                color: "#d92027",
                 fontSize: 22,
               }}
             >
@@ -69,7 +69,7 @@ export default function OpenGraphImage() {
             <p
               style={{
                 margin: 0,
-                color: "#ff8ab6",
+                color: "#ff666b",
                 fontSize: 18,
                 letterSpacing: 5,
                 textTransform: "uppercase",
