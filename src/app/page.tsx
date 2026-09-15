@@ -65,7 +65,7 @@ export default function HomePage() {
           <div className="hero__panel hero__panel--one">
             <Image
               src="/media/reel-henna.jpg"
-              alt="Temporary placeholder for a portrait-moment reel"
+              alt="Intricate henna art on hand, captured in warm close-up"
               fill
               priority
               sizes="(max-width: 800px) 50vw, 22vw"
@@ -74,7 +74,7 @@ export default function HomePage() {
           <div className="hero__panel hero__panel--two">
             <Image
               src="/media/reel-concert-aug28.jpg"
-              alt="Temporary placeholder for a concert stage reel"
+              alt="Artist performing live on stage, crowd lit by dramatic spotlights"
               fill
               priority
               sizes="(max-width: 800px) 50vw, 22vw"
@@ -83,7 +83,7 @@ export default function HomePage() {
           <div className="hero__panel hero__panel--three">
             <Image
               src="/media/reel-kiran-dallas.jpg"
-              alt="Temporary placeholder for a Dallas event reel"
+              alt="Kiran performing at a Dallas live event, warm stage lighting"
               fill
               priority
               sizes="18vw"
@@ -152,7 +152,7 @@ export default function HomePage() {
             <div className="about__image-main">
               <Image
                 src="/media/reel-ata.jpg"
-                alt="Temporary placeholder for an event portrait"
+                alt="Candid moment inside the ATA event hall, warm ambient lighting"
                 fill
                 sizes="(max-width: 800px) 88vw, 42vw"
               />
@@ -160,7 +160,7 @@ export default function HomePage() {
             <div className="about__image-small">
               <Image
                 src="/media/reel-shawl.jpg"
-                alt="Temporary placeholder for a candid indoor moment"
+                alt="Candid indoor portrait in a colourful woven shawl"
                 fill
                 sizes="(max-width: 800px) 42vw, 17vw"
               />
@@ -225,9 +225,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="service-grid">
+          <div className="service-grid" data-stagger>
             {reelProcess.map((service) => (
-              <article className="service-card" key={service.name} data-reveal>
+              <article className="service-card" key={service.name}>
                 <div className="service-card__media">
                   <Image
                     src={service.image}
@@ -332,7 +332,7 @@ export default function HomePage() {
           >
             <Image
               src="/media/reel-concert-aug28.jpg"
-              alt="Temporary placeholder for live-stage footage"
+              alt="Artist performing on a concert stage, crowd illuminated by dramatic stage lights"
               fill
               sizes="95vw"
             />
@@ -355,7 +355,7 @@ export default function HomePage() {
             <div className="booking-editorial__main">
               <Image
                 src="/media/reel-henna.jpg"
-                alt="Temporary placeholder for project inspiration"
+                alt="Intricate henna art — close-up portrait moment"
                 fill
                 sizes="(max-width: 800px) 94vw, 48vw"
               />
@@ -364,7 +364,7 @@ export default function HomePage() {
               <div>
                 <Image
                   src="/media/reel-concert-aug28.jpg"
-                  alt=""
+                  alt="Concert stage performance, live event coverage"
                   fill
                   sizes="22vw"
                 />
@@ -372,7 +372,7 @@ export default function HomePage() {
               <div>
                 <Image
                   src="/media/reel-aurum.jpg"
-                  alt=""
+                  alt="The Aurum luxury venue interior"
                   fill
                   sizes="22vw"
                 />

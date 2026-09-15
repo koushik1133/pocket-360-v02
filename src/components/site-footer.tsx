@@ -31,14 +31,14 @@ export function SiteFooter({
         </div>
 
         <div className="site-footer__columns">
-          <div>
+          <nav aria-label="Site navigation">
             <p className="footer-label">Explore</p>
             {navigation.map((item) => (
               <Link key={item.label} href={item.href}>
                 {item.label}
               </Link>
             ))}
-          </div>
+          </nav>
           <div>
             <p className="footer-label">Connect</p>
             <a href={brand.instagramUrl} target="_blank" rel="noreferrer">

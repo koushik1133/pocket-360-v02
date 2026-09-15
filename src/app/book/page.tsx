@@ -31,7 +31,7 @@ export default function BookPage() {
           <div className="booking-project__primary">
             <Image
               src="/media/reel-concert-aug28.jpg"
-              alt="Temporary placeholder for live event footage"
+              alt="Artist performing live on stage — the kind of moment Pocket Reels captures"
               fill
               priority
               sizes="(max-width: 900px) 94vw, 45vw"
@@ -47,7 +47,7 @@ export default function BookPage() {
             <div>
               <Image
                 src="/media/reel-henna.jpg"
-                alt="Temporary placeholder for a portrait reel frame"
+                alt="Intricate henna art — portrait reel frame"
                 fill
                 sizes="22vw"
               />
@@ -55,7 +55,7 @@ export default function BookPage() {
             <div>
               <Image
                 src="/media/reel-grocery.jpg"
-                alt="Temporary placeholder for a brand reel frame"
+                alt="Signature India Grocery — brand reel frame"
                 fill
                 sizes="22vw"
               />

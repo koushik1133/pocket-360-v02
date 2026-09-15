@@ -21,6 +21,7 @@ const categories: readonly ("All" | WorkCategory)[] = [
 export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
   const [filter, setFilter] = useState<(typeof categories)[number]>("All");
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [closing, setClosing] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const pointerStartX = useRef<number | null>(null);
@@ -45,8 +46,12 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
   );
 
   const close = () => {
-    setActiveId(null);
-    window.setTimeout(() => triggerRef.current?.focus(), 0);
+    setClosing(true);
+    window.setTimeout(() => {
+      setActiveId(null);
+      setClosing(false);
+      window.setTimeout(() => triggerRef.current?.focus(), 0);
+    }, 180);
   };
 
   useEffect(() => {
@@ -70,7 +75,11 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
 
   return (
     <>
-      <div className="work-filters" aria-label="Filter work">
+      <div
+        className="work-filters"
+        aria-label="Filter by category"
+        role="group"
+      >
         {categories.map((category) => (
           <button
             type="button"
@@ -124,7 +133,7 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
 
       {activeItem ? (
         <div
-          className="lightbox"
+          className={`lightbox${closing ? " lightbox--closing" : ""}`}
           role="dialog"
           aria-modal="true"
           aria-labelledby="lightbox-title"
