@@ -94,34 +94,6 @@ export function HeroCanvas() {
     const particles = new THREE.Points(geometry, material);
     scene.add(particles);
 
-    // ─── Wireframe Torus Ring ────────────────────────────────────────────────
-    const ringGeo = new THREE.TorusGeometry(1.4, 0.007, 16, 80);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: 0x9e0813,
-      transparent: true,
-      opacity: 0.12,
-      wireframe: true,
-    });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.set(1.8, 1.2, -1.4);
-    ring.rotation.x = Math.PI / 3;
-    ring.rotation.y = Math.PI / 5;
-    scene.add(ring);
-
-    // ─── Second accent ring (smaller, opposite corner) ──────────────────────
-    const ring2Geo = new THREE.TorusGeometry(0.7, 0.004, 12, 48);
-    const ring2Mat = new THREE.MeshBasicMaterial({
-      color: 0xcc101e,
-      transparent: true,
-      opacity: 0.08,
-      wireframe: true,
-    });
-    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
-    ring2.position.set(-2.2, -0.8, -0.8);
-    ring2.rotation.x = -Math.PI / 4;
-    ring2.rotation.z = Math.PI / 6;
-    scene.add(ring2);
-
     // ─── Mouse tracking ──────────────────────────────────────────────────────
     let mouseX = 0;
     let mouseY = 0;
@@ -165,13 +137,6 @@ export function HeroCanvas() {
       particles.position.x = mouseX * 0.6;
       particles.position.y = -mouseY * 0.2;
 
-      ring.rotation.z += 0.0015;
-      ring.rotation.x = Math.PI / 3 + mouseY * 0.25;
-      ring.rotation.y = Math.PI / 6 + mouseX * 0.25;
-
-      ring2.rotation.z -= 0.002;
-      ring2.rotation.y = -Math.PI / 4 + mouseX * 0.15;
-
       renderer.render(scene, camera);
     };
 
@@ -209,10 +174,6 @@ export function HeroCanvas() {
       window.removeEventListener("resize", onResize);
       geometry.dispose();
       material.dispose();
-      ringGeo.dispose();
-      ringMat.dispose();
-      ring2Geo.dispose();
-      ring2Mat.dispose();
       renderer.dispose();
     };
   }, []);
