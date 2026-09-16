@@ -16,14 +16,46 @@ import {
   PlayIcon,
   WhatsAppIcon,
 } from "@/components/icons";
-import { HeroCanvas } from "@/components/hero-canvas";
+import dynamic from "next/dynamic";
 import { WorkGallery } from "@/components/work-gallery";
 import { PinnedProcess } from "@/components/pinned-process";
 import { FeaturedSpotlight } from "@/components/featured-spotlight";
-import { CurvedReelDial } from "@/components/curved-reel-dial";
 import { Magnetic } from "@/motion/magnetic";
 import { TextReveal } from "@/motion/text-reveal";
 import { emailUrl, whatsappUrl } from "@/lib/contact-links";
+
+const HeroCanvas = dynamic(
+  () => import("@/components/hero-canvas").then((m) => m.HeroCanvas),
+  {
+    loading: () => (
+      <div
+        className="hero-canvas-container absolute inset-0 pointer-events-none overflow-hidden z-0"
+        aria-hidden="true"
+      >
+        <div className="hero-fallback-ambient" />
+      </div>
+    ),
+  },
+);
+
+const CurvedReelDial = dynamic(
+  () => import("@/components/curved-reel-dial").then((m) => m.CurvedReelDial),
+  {
+    loading: () => (
+      <section
+        className="curved-dial-section relative min-h-[50vh] bg-ink text-white overflow-hidden flex flex-col justify-center py-16"
+        style={{ backgroundColor: "#141312" }}
+      >
+        <div className="page-shell text-center">
+          <p className="eyebrow eyebrow--light">IMMERSIVE REEL CYLINDER</p>
+          <h2 className="text-3xl sm:text-5xl font-medium tracking-tight text-white mt-2">
+            Scroll through <em className="font-serif text-accent italic font-normal">the reels.</em>
+          </h2>
+        </div>
+      </section>
+    ),
+  },
+);
 
 export default function HomePage() {
   const whatsapp = whatsappUrl(env.NEXT_PUBLIC_WHATSAPP_NUMBER);

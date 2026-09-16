@@ -133,12 +133,16 @@ export function SiteMotion() {
     ).matches;
     if (prefersReduced) return;
 
+    // Only run on desktop devices to avoid CPU throttling on mobile
+    const isDesktop = window.matchMedia("(min-width: 900px)").matches;
+    if (!isDesktop) return;
+
     const parallaxItems = document.querySelectorAll<HTMLElement>("[data-parallax-speed]");
     if (parallaxItems.length === 0) return;
 
-    let rafId: number;
+    let ticking = false;
 
-    const onScroll = () => {
+    const updateParallax = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
 
@@ -150,17 +154,21 @@ export function SiteMotion() {
           el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
         }
       });
+      ticking = false;
     };
 
-    const loop = () => {
-      onScroll();
-      rafId = requestAnimationFrame(loop);
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateParallax);
+      }
     };
 
-    rafId = requestAnimationFrame(loop);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    updateParallax();
 
     return () => {
-      cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
       parallaxItems.forEach((el) => {
         el.style.transform = "";
       });

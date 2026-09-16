@@ -29,6 +29,12 @@ export function HeroCanvas() {
       return;
     }
 
+    // Disable WebGL loop entirely on mobile screens (< 768px) to eliminate CPU/GPU thrashing
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    if (isMobile) {
+      return;
+    }
+
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -40,10 +46,10 @@ export function HeroCanvas() {
       renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
-        antialias: true,
+        antialias: false,
         powerPreference: "high-performance",
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(container.clientWidth, container.clientHeight);
     } catch {
       return;
@@ -59,7 +65,7 @@ export function HeroCanvas() {
     camera.position.z = 5;
 
     // Create subtle particles / light dust field
-    const particleCount = 45;
+    const particleCount = 35;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const scales = new Float32Array(particleCount);
@@ -102,6 +108,7 @@ export function HeroCanvas() {
     let mouseY = 0;
     let targetX = 0;
     let targetY = 0;
+    let isVisible = true;
 
     const onMouseMove = (e: MouseEvent) => {
       targetX = (e.clientX / window.innerWidth - 0.5) * 0.6;
@@ -113,6 +120,9 @@ export function HeroCanvas() {
     let animationFrameId: number;
 
     const animate = () => {
+      if (!isVisible) {
+        return;
+      }
       animationFrameId = requestAnimationFrame(animate);
 
       mouseX += (targetX - mouseX) * 0.05;
@@ -129,6 +139,22 @@ export function HeroCanvas() {
       renderer.render(scene, camera);
     };
 
+    // Pause RAF loop when hero scrolls out of view
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const currentlyVisible = entry ? entry.isIntersecting : true;
+        if (currentlyVisible && !isVisible) {
+          isVisible = true;
+          animate();
+        } else if (!currentlyVisible && isVisible) {
+          isVisible = false;
+          cancelAnimationFrame(animationFrameId);
+        }
+      },
+      { threshold: 0.05 },
+    );
+
+    observer.observe(container);
     animate();
 
     const onResize = () => {
@@ -138,9 +164,10 @@ export function HeroCanvas() {
       renderer.setSize(container.clientWidth, container.clientHeight);
     };
 
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);

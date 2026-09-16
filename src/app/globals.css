@@ -6,7 +6,7 @@
   --color-ivory: #faf9f5;
   --color-paper: #f4f2eb;
   --color-surface: #ffffff;
-  --color-muted: #5e5b56;
+  --color-muted: #46433e;
   --color-line: #dedad2;
   --color-accent: #cc101e;
   --color-accent-dark: #9e0813;
@@ -24,7 +24,7 @@
   --color-ivory: #faf9f5;
   --color-paper: #f4f2eb;
   --color-surface: #ffffff;
-  --color-muted: #5e5b56;
+  --color-muted: #46433e;
   --color-line: #dedad2;
   --color-accent: #cc101e;
   --color-accent-dark: #9e0813;
@@ -169,7 +169,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  color: #554e4a;
+  color: #46433e;
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
@@ -182,11 +182,11 @@ h3 {
 }
 
 .text-muted {
-  color: #554e4a !important;
+  color: #46433e !important;
 }
 
 .highlight-row > p {
-  color: #554e4a !important;
+  color: #46433e !important;
 }
 
 .eyebrow::before {
@@ -194,10 +194,6 @@ h3 {
   height: 1px;
   content: "";
   background: currentColor;
-}
-
-.eyebrow--light {
-  color: oklch(0.8 0.012 82);
 }
 
 .button {
@@ -2910,7 +2906,8 @@ h3 {
     min-height: 68svh;
   }
 
-  .featured__copy strong {
+  .featured__copy strong,
+  .featured__copy h2 {
     font-size: clamp(2.8rem, 14vw, 4.5rem);
   }
 
@@ -3878,4 +3875,44 @@ h3 {
     display: none !important;
   }
 }
+
+/* ─── WCAG 2.2 AAA TOUCH TARGET ACCESSIBILITY (48px x 48px MINIMUM) ─── */
+@media (pointer: coarse), (max-width: 768px) {
+  .work-filters button {
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0.65rem 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+  }
+
+  .site-header__actions .button,
+  .site-header .menu-toggle {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .journey-card {
+    min-height: 48px;
+  }
+
+  .reel-card {
+    min-height: 48px;
+  }
+
+  .site-footer__columns a,
+  .site-footer__bottom a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .booking-progress button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
 

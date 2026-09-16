@@ -187,9 +187,9 @@ export function FeaturedSpotlight({ item }: FeaturedSpotlightProps) {
             <small className="text-accent-soft uppercase tracking-widest text-xs font-bold block mb-1">
               IN THE ROOM
             </small>
-            <strong className="text-3xl sm:text-5xl md:text-6xl text-white font-medium tracking-tight block">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl text-white font-medium tracking-tight block">
               {item.title}
-            </strong>
+            </h2>
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 group-hover:text-white mt-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 transition-colors">
               View original reel
               <ArrowUpRightIcon size={16} />
