@@ -31,12 +31,20 @@ export function SiteMotion() {
 
     const observeAllReveals = () => {
       const elements = document.querySelectorAll<HTMLElement>("[data-reveal]");
+      const vh = window.innerHeight;
       elements.forEach((el) => {
         if (prefersReduced) {
           el.classList.add("is-visible");
         } else if (!observedReveals.has(el) && !el.classList.contains("is-visible")) {
-          observedReveals.add(el);
-          revealObserver.observe(el);
+          // Immediately reveal elements already in the viewport (hero section)
+          // so they don't cause an LCP delay while waiting for IO callback.
+          const rect = el.getBoundingClientRect();
+          if (rect.top < vh && rect.bottom > 0) {
+            el.classList.add("is-visible");
+          } else {
+            observedReveals.add(el);
+            revealObserver.observe(el);
+          }
         }
       });
     };

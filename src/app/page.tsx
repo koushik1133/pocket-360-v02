@@ -72,10 +72,10 @@ export default function HomePage() {
 
         <div className="hero__copy page-shell relative z-10">
           <div className="hero__content">
-            <p className="eyebrow">
+            <p className="eyebrow" data-reveal>
               Your viral reel-maker crew
             </p>
-            <div className="hero__title-wrap">
+            <div className="hero__title-wrap" data-reveal>
               <TextReveal
                 text="Your spotlight, in motion."
                 as="h1"
@@ -84,11 +84,11 @@ export default function HomePage() {
                 highlightClass="text-accent font-serif italic"
               />
             </div>
-            <p className="hero__lede mt-4">
+            <p className="hero__lede mt-4" data-reveal>
               Pocket Reels shoots on iPhone, edits, and delivers hassle-free
               social reels for events, brands, and creators.
             </p>
-            <div className="hero__actions mt-8 flex flex-wrap items-center gap-4">
+            <div className="hero__actions mt-8 flex flex-wrap items-center gap-4" data-reveal>
               <Magnetic strength={0.4}>
                 <Link className="button button--dark" href="/book">
                   Book an appointment
@@ -103,7 +103,7 @@ export default function HomePage() {
               </Magnetic>
             </div>
           </div>
-          <p className="hero__location">
+          <p className="hero__location" data-reveal>
             <MapPinIcon size={16} />
             {brand.locationLine}
           </p>

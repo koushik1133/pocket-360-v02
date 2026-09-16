@@ -53,6 +53,11 @@ const schema = z.object({
       (value) => value === undefined || value.startsWith("postgres"),
       "DATABASE_URL must start with postgres",
     ),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_ANON_KEY: z
+    .string()
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : undefined)),
   ALLOW_FILE_APPOINTMENTS: z
     .string()
     .optional()
@@ -94,6 +99,8 @@ const parsed = schema.safeParse({
   NODE_ENV: process.env.NODE_ENV,
   NEXT_PUBLIC_SITE_URL: resolveSiteUrl(process.env),
   DATABASE_URL: blankToUndefined(process.env.DATABASE_URL),
+  NEXT_PUBLIC_SUPABASE_URL: blankToUndefined(process.env.NEXT_PUBLIC_SUPABASE_URL),
+  SUPABASE_ANON_KEY: blankToUndefined(process.env.SUPABASE_ANON_KEY),
   ALLOW_FILE_APPOINTMENTS: blankToUndefined(process.env.ALLOW_FILE_APPOINTMENTS),
   RESEND_API_KEY: blankToUndefined(process.env.RESEND_API_KEY),
   GROQ_API_KEY: blankToUndefined(process.env.GROQ_API_KEY),

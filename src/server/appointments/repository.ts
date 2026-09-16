@@ -4,6 +4,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import postgres from "postgres";
 import type { AppointmentInput } from "@/lib/appointment-schema";
+import { getSupabaseClient } from "@/lib/supabase";
 import { env } from "@/env";
 
 export type AppointmentStatus =
@@ -29,6 +30,8 @@ export class BookingStorageUnavailableError extends Error {
   }
 }
 
+// ─── Postgres (legacy / direct) ──────────────────────────────────────────────
+
 const globalForDatabase = globalThis as typeof globalThis & {
   pocketReelsSql?: ReturnType<typeof postgres>;
 };
@@ -43,6 +46,8 @@ function database() {
   });
   return globalForDatabase.pocketReelsSql;
 }
+
+// ─── Local file fallback ──────────────────────────────────────────────────────
 
 // On Vercel / serverless environments, root filesystem is read-only; /tmp is writable.
 const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
@@ -119,6 +124,104 @@ async function createLocalAppointment(
   });
 }
 
+// ─── Supabase helpers ─────────────────────────────────────────────────────────
+
+type SupabaseAppointmentRow = {
+  id: string;
+  service: AppointmentInput["service"];
+  appointment_date: string;
+  appointment_time: string;
+  name: string;
+  phone: string;
+  email: string;
+  project_details: string;
+  status: AppointmentStatus;
+  created_at: string;
+  idempotency_key: string;
+};
+
+function fromSupabaseRow(row: SupabaseAppointmentRow): AppointmentRecord {
+  return {
+    id: row.id,
+    service: row.service,
+    packageType: "Wedding & Event Reels",
+    date: row.appointment_date,
+    time: row.appointment_time.slice(0, 5),
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    country: "United States",
+    state: "",
+    city: "",
+    locationVenue: "",
+    preferredTimeToCall: "Anytime",
+    eventDetails: row.project_details,
+    projectDetails: row.project_details,
+    status: row.status,
+    createdAt: row.created_at,
+    idempotencyKey: row.idempotency_key,
+    website: "",
+  };
+}
+
+async function createSupabaseAppointment(
+  input: AppointmentInput,
+): Promise<CreateAppointmentResult> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return createLocalAppointment(input);
+
+  // Idempotency: check for existing record first
+  const { data: existing } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("idempotency_key", input.idempotencyKey)
+    .maybeSingle<SupabaseAppointmentRow>();
+
+  if (existing) {
+    return { ok: true, record: fromSupabaseRow(existing), created: false };
+  }
+
+  // Slot conflict check
+  const { data: conflict } = await supabase
+    .from("appointments")
+    .select("id")
+    .eq("service", input.service)
+    .eq("appointment_date", input.date)
+    .eq("appointment_time", input.time)
+    .in("status", ["pending", "confirmed"])
+    .maybeSingle();
+
+  if (conflict) {
+    return { ok: false, code: "SLOT_TAKEN" };
+  }
+
+  const { data: inserted, error } = await supabase
+    .from("appointments")
+    .insert({
+      service: input.service,
+      appointment_date: input.date,
+      appointment_time: input.time,
+      name: input.name,
+      phone: input.phone,
+      email: input.email,
+      project_details: input.projectDetails,
+      status: "pending",
+      idempotency_key: input.idempotencyKey,
+    })
+    .select("*")
+    .single<SupabaseAppointmentRow>();
+
+  if (error) {
+    console.error("[supabase] createAppointment error:", error);
+    // Fall back to local file if Supabase insert fails
+    return createLocalAppointment(input);
+  }
+
+  return { ok: true, record: fromSupabaseRow(inserted), created: true };
+}
+
+// ─── Postgres helpers ─────────────────────────────────────────────────────────
+
 type DatabaseAppointment = {
   id: string;
   service: AppointmentInput["service"];
@@ -157,9 +260,17 @@ function toRecord(row: DatabaseAppointment): AppointmentRecord {
   };
 }
 
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Priority: Supabase → postgres → local-file
+ */
 export async function createAppointment(
   input: AppointmentInput,
 ): Promise<CreateAppointmentResult> {
+  // Supabase takes priority when configured
+  if (getSupabaseClient()) return createSupabaseAppointment(input);
+
   const sql = database();
   if (!sql) return createLocalAppointment(input);
 
@@ -233,6 +344,23 @@ export async function createAppointment(
 }
 
 export async function listAppointments(): Promise<AppointmentRecord[]> {
+  // Supabase
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("appointments")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .returns<SupabaseAppointmentRow[]>();
+
+    if (error) {
+      console.error("[supabase] listAppointments error:", error);
+      return [];
+    }
+    return (data ?? []).map(fromSupabaseRow);
+  }
+
+  // Postgres
   const sql = database();
   if (!sql) {
     const list = await readLocalAppointments();
@@ -266,6 +394,12 @@ export async function listAppointments(): Promise<AppointmentRecord[]> {
 }
 
 export async function appointmentStorageHealth() {
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    const { error } = await supabase.from("appointments").select("id").limit(1);
+    return { ready: !error, storage: "supabase" as const };
+  }
+
   const sql = database();
   if (sql) {
     await sql`select 1`;
