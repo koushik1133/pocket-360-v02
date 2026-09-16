@@ -6,6 +6,8 @@ import { MobileActionBar } from "@/components/mobile-action-bar";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SiteMotion } from "@/components/site-motion";
+import { LenisProvider } from "@/motion/lenis-provider";
+import { CustomCursor } from "@/motion/custom-cursor";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -92,16 +94,19 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main-content">{children}</main>
-        <SiteFooter {...contact} />
-        <MobileActionBar whatsappNumber={contact.whatsappNumber} />
-        <AssistantWidget
-          whatsappNumber={contact.whatsappNumber}
-          contactEmail={contact.contactEmail}
-          contactPhone={contact.contactPhone}
-        />
-        <SiteMotion />
+        <LenisProvider>
+          <CustomCursor />
+          <SiteHeader />
+          <main id="main-content">{children}</main>
+          <SiteFooter {...contact} />
+          <MobileActionBar whatsappNumber={contact.whatsappNumber} />
+          <AssistantWidget
+            whatsappNumber={contact.whatsappNumber}
+            contactEmail={contact.contactEmail}
+            contactPhone={contact.contactPhone}
+          />
+          <SiteMotion />
+        </LenisProvider>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

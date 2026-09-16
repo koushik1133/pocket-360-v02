@@ -7,7 +7,13 @@ const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 export const appointmentSchema = z.object({
-  service: z.literal("reel-production"),
+  service: z.string().default("reel-production"),
+  packageType: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().min(1, "Select a package type").max(100))
+    .optional()
+    .default("Wedding & Event Reels"),
   date: z
     .string()
     .regex(datePattern, "Choose a valid date")
@@ -15,11 +21,15 @@ export const appointmentSchema = z.object({
       const date = new Date(`${value}T12:00:00Z`);
       return !Number.isNaN(date.valueOf()) && date.toISOString().startsWith(value);
     }, "Choose a valid date"),
-  time: z.string().regex(timePattern, "Choose a valid time"),
+  time: z
+    .string()
+    .regex(timePattern, "Choose a valid time")
+    .optional()
+    .default("12:00"),
   name: z
     .string()
     .transform(cleanText)
-    .pipe(z.string().min(2, "Enter your name").max(80, "Name is too long")),
+    .pipe(z.string().min(2, "Enter your full name").max(100, "Name is too long")),
   phone: z
     .string()
     .transform(cleanText)
@@ -37,11 +47,47 @@ export const appointmentSchema = z.object({
   email: z
     .string()
     .transform((value) => cleanText(value).toLowerCase())
-    .pipe(z.string().email("Enter a valid email").max(254)),
+    .pipe(z.string().email("Enter a valid email address").max(254)),
+  country: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().max(80))
+    .optional()
+    .default("United States"),
+  state: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().max(80))
+    .optional()
+    .default(""),
+  city: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().max(80))
+    .optional()
+    .default(""),
+  locationVenue: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().max(200))
+    .optional()
+    .default(""),
+  preferredTimeToCall: z
+    .string()
+    .transform(cleanText)
+    .pipe(z.string().max(100))
+    .optional()
+    .default("Anytime"),
+  eventDetails: z
+    .string()
+    .transform((value) => value.replace(/\0/g, "").trim())
+    .pipe(z.string().max(3000, "Keep details under 3,000 characters"))
+    .optional()
+    .default(""),
   projectDetails: z
     .string()
     .transform((value) => value.replace(/\0/g, "").trim())
-    .pipe(z.string().max(2000, "Keep project details under 2,000 characters"))
+    .pipe(z.string().max(3000, "Keep project details under 3,000 characters"))
     .optional()
     .default(""),
   website: z.string().max(0).optional().default(""),
@@ -58,7 +104,8 @@ export function isBookableDate(value: string, now = new Date()) {
   return selected >= now && selected <= latest;
 }
 
-export function serviceLabel(service: AppointmentInput["service"]) {
+export function serviceLabel(service: string) {
   if (service === "reel-production") return "Reel production";
-  return service satisfies never;
+  return service || "Reel production";
 }
+

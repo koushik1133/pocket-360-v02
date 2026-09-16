@@ -5,6 +5,11 @@ const scriptPolicy =
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self' 'unsafe-inline'";
 
+const connectPolicy =
+  process.env.NODE_ENV === "development"
+    ? "connect-src 'self' ws: wss: https://api.resend.com https://api.groq.com"
+    : "connect-src 'self' https://api.resend.com https://api.groq.com";
+
 const csp = [
   "default-src 'self'",
   scriptPolicy,
@@ -12,7 +17,7 @@ const csp = [
   "img-src 'self' data: blob: https://www.instagram.com https://scontent.cdninstagram.com",
   "media-src 'self' blob:",
   "font-src 'self'",
-  "connect-src 'self' https://api.resend.com",
+  connectPolicy,
   "frame-src https://www.instagram.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -20,7 +25,6 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   turbopack: {
@@ -42,7 +46,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           {
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(), microphone=(self), geolocation=()",
           },
           {
             key: "Strict-Transport-Security",

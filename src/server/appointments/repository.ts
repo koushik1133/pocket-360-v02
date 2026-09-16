@@ -133,11 +133,18 @@ function toRecord(row: DatabaseAppointment): AppointmentRecord {
   return {
     id: row.id,
     service: row.service,
+    packageType: "Wedding & Event Reels",
     date: row.date,
     time: row.time.slice(0, 5),
     name: row.name,
     phone: row.phone,
     email: row.email,
+    country: "United States",
+    state: "",
+    city: "",
+    locationVenue: "",
+    preferredTimeToCall: "Anytime",
+    eventDetails: row.projectDetails,
     projectDetails: row.projectDetails,
     status: row.status,
     createdAt: row.createdAt,
@@ -219,6 +226,39 @@ export async function createAppointment(
   }
 
   return { ok: false, code: "SLOT_TAKEN" };
+}
+
+export async function listAppointments(): Promise<AppointmentRecord[]> {
+  const sql = database();
+  if (!sql) {
+    const list = await readLocalAppointments();
+    return list.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }
+
+  try {
+    const rows = await sql<DatabaseAppointment[]>`
+      select
+        id,
+        service,
+        appointment_date::text as date,
+        appointment_time::text as time,
+        name,
+        phone,
+        email,
+        project_details as "projectDetails",
+        status,
+        created_at::text as "createdAt",
+        idempotency_key as "idempotencyKey"
+      from appointments
+      order by created_at desc
+    `;
+    return rows.map(toRecord);
+  } catch (error) {
+    console.error("Failed to query appointments from database", error);
+    return [];
+  }
 }
 
 export async function appointmentStorageHealth() {

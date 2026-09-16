@@ -3,11 +3,11 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: 0,
+  workers: 1,
   reporter: [["line"]],
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://localhost:3003",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -19,9 +19,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --hostname 127.0.0.1",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    command: "ALLOW_FILE_APPOINTMENTS=true npm run start -- -p 3003",
+    url: "http://localhost:3003",
+    reuseExistingServer: true,
     timeout: 120_000,
   },
 });
+

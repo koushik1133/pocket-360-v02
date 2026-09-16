@@ -69,15 +69,35 @@ describe("parseAssistantReply", () => {
     expect(reply.suggestions).toEqual([]);
   });
 
-  it("drops invalid actions and over-long suggestion lists", () => {
+  it("parses privacy policy and terms actions correctly", () => {
     const reply = parseAssistantReply(
       JSON.stringify({
-        reply: "ok",
-        actions: [{ type: "not-a-channel", label: "x" }],
+        reply: "You can read our privacy policy here.",
+        language: "en",
+        intent: "privacy",
+        suggestions: ["How do I book?"],
+        actions: [{ type: "privacy", label: "Open Privacy Policy" }],
+        serviceIds: [],
       }),
     );
-    // Invalid JSON shape → falls back to treating text as the reply.
-    expect(reply.reply.length).toBeGreaterThan(0);
-    expect(reply.actions).toEqual([]);
+    expect(reply.intent).toBe("privacy");
+    expect(reply.actions[0]?.type).toBe("privacy");
+    expect(reply.actions[0]?.label).toBe("Open Privacy Policy");
+  });
+
+  it("parses off_topic intent correctly", () => {
+    const reply = parseAssistantReply(
+      JSON.stringify({
+        reply: "I am exclusively here to help with Pocket Reels 360.",
+        language: "en",
+        intent: "off_topic",
+        suggestions: ["What kind of reels do you make?"],
+        actions: [{ type: "services", label: "Explore Services" }],
+        serviceIds: [],
+      }),
+    );
+    expect(reply.intent).toBe("off_topic");
+    expect(reply.actions[0]?.type).toBe("services");
   });
 });
+

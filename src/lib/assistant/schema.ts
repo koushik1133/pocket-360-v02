@@ -18,21 +18,32 @@ export const assistantIntents = [
   "requirements",
   "portfolio",
   "contact",
+  "privacy",
+  "terms",
+  "company_info",
   "human_handoff",
   "smalltalk",
+  "off_topic",
   "other",
 ] as const;
 
 export type AssistantIntent = (typeof assistantIntents)[number];
 
-/** Channels the assistant can steer a visitor toward. */
+/** Channels and internal views the assistant can direct a visitor toward. */
 export const assistantActionTypes = [
   "book",
   "whatsapp",
   "email",
   "call",
   "instagram",
+  "privacy",
+  "terms",
+  "work",
+  "about",
+  "contact",
+  "services",
 ] as const;
+
 
 export type AssistantActionType = (typeof assistantActionTypes)[number];
 

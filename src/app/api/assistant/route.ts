@@ -109,12 +109,146 @@ function fallbackActions(channels: AvailableChannels): AssistantAction[] {
   return actions;
 }
 
-function degradedResponse(channels: AvailableChannels): AssistantResponse {
+function degradedResponse(
+  channels: AvailableChannels,
+  lastUserMessage?: string,
+): AssistantResponse {
+  const query = (lastUserMessage ?? "").toLowerCase().trim();
+
+  // 1. Privacy Policy query
+  if (/privacy|private|data|policy/i.test(query)) {
+    return {
+      reply:
+        "Pocket Reels 360 values your privacy. We only collect the contact and event details you share to coordinate your shoot, and we never sell or share your data. You can open and read our complete Privacy Policy below.",
+      language: "en",
+      intent: "privacy",
+      suggestions: ["What kind of reels do you make?", "How do I book a shoot?"],
+      actions: [
+        { type: "privacy", label: "Open Privacy Policy" },
+        { type: "book", label: "Book a Shoot" },
+      ],
+      serviceIds: [],
+      degraded: true,
+    };
+  }
+
+  // 2. Terms & Conditions query
+  if (/terms|condition|agreement|contract/i.test(query)) {
+    return {
+      reply:
+        "Pocket Reels 360 provides vertical video shoot, edit, and delivery services based on clear, custom scoped agreements. You can view our full terms and conditions below.",
+      language: "en",
+      intent: "terms",
+      suggestions: ["What do you shoot on?", "Where do you operate?"],
+      actions: [
+        { type: "terms", label: "Terms & Conditions" },
+        { type: "book", label: "Book a Shoot" },
+      ],
+      serviceIds: [],
+      degraded: true,
+    };
+  }
+
+  // 3. Off-topic query rejection
+  if (
+    /python|javascript|coding|recipe|cook|bake|weather|homework|math|calc|president|stock|crypto|crypto\b|bitcoin|translate|who is|joke/i.test(
+      query,
+    )
+  ) {
+    return {
+      reply:
+        "I'm exclusively here to assist with Pocket Reels 360 video production, packages, and bookings. How can I help you with your next video project?",
+      language: "en",
+      intent: "off_topic",
+      suggestions: [
+        "What kind of reels do you make?",
+        "Where are your production hubs?",
+        "How do I book a shoot?",
+      ],
+      actions: [
+        { type: "services", label: "Explore Services" },
+        { type: "book", label: "Book a Shoot" },
+      ],
+      serviceIds: [],
+      degraded: true,
+    };
+  }
+
+  // 4. Portfolio & Work
+  if (/work|portfolio|sample|example|anirudh|kiran|aurum|show me|video/i.test(query)) {
+    return {
+      reply:
+        "We specialize in vertical 9:16 reels for live events (concerts, music tours), brands, luxury real estate, and portrait milestones. Check out our featured portfolio below!",
+      language: "en",
+      intent: "portfolio",
+      suggestions: ["What do you shoot on?", "How much does a shoot cost?"],
+      actions: [
+        { type: "work", label: "View Portfolio" },
+        { type: "book", label: "Book a Shoot" },
+      ],
+      serviceIds: ["event-reels", "brand-reels"],
+      degraded: true,
+    };
+  }
+
+  // 5. Pricing & Packages
+  if (/price|pricing|cost|how much|rate|package|quote/i.test(query)) {
+    return {
+      reply:
+        "Every shoot is custom-quoted based on coverage hours, location, and speed. Submit an enquiry on our booking page to get a clear package quote within 24 hours.",
+      language: "en",
+      intent: "pricing",
+      suggestions: ["What do you shoot on?", "Where do you operate?"],
+      actions: [
+        { type: "book", label: "Get a Custom Quote" },
+        { type: "whatsapp", label: "Chat on WhatsApp" },
+      ],
+      serviceIds: ["event-reels", "brand-reels"],
+      degraded: true,
+    };
+  }
+
+  // 6. Hubs & Locations
+  if (/location|where|city|dallas|nyc|new york|chicago|charlotte|travel/i.test(query)) {
+    return {
+      reply:
+        "Pocket Reels 360 has active production hubs in Dallas (HQ), New York City, Chicago, and Charlotte, and we also travel nationwide for select events and tours.",
+      language: "en",
+      intent: "company_info",
+      suggestions: ["How do I book a shoot?", "What gear do you shoot on?"],
+      actions: [{ type: "book", label: "Check Availability" }],
+      serviceIds: [],
+      degraded: true,
+    };
+  }
+
+  // 7. Gear & Tech
+  if (/gear|iphone|camera|tech|4k|prores|hardware/i.test(query)) {
+    return {
+      reply:
+        "Everything is shot on iPhone in 4K ProRes with mobile gimbals and pro wireless lavalier audio — keeping the crew agile, fast, and close to the action.",
+      language: "en",
+      intent: "services",
+      suggestions: ["What kind of reels do you make?", "How do I book?"],
+      actions: [
+        { type: "services", label: "Our Services" },
+        { type: "book", label: "Book a Shoot" },
+      ],
+      serviceIds: [],
+      degraded: true,
+    };
+  }
+
+  // Default fallback
   return {
     reply: FALLBACK_REPLY,
     language: "en",
     intent: "human_handoff",
-    suggestions: [],
+    suggestions: [
+      "What kind of reels do you make?",
+      "How much does a reel cost?",
+      "I want to book a shoot",
+    ],
     actions: fallbackActions(channels),
     serviceIds: [],
     degraded: true,
@@ -185,10 +319,12 @@ export async function POST(request: NextRequest) {
   }
 
   const channels = availableChannels();
+  const lastUserMsg =
+    parsed.data.messages[parsed.data.messages.length - 1]?.content;
 
-  // No key configured: keep the widget useful with a canned handoff.
+  // No key configured: keep the widget useful with a contextual handoff.
   if (!assistantConfigured()) {
-    return Response.json(degradedResponse(channels), {
+    return Response.json(degradedResponse(channels, lastUserMsg), {
       status: 200,
       headers: { "Cache-Control": "no-store" },
     });
@@ -207,7 +343,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof AssistantUnavailableError) {
       // Soft-fail: still hand the visitor a useful next step.
-      return Response.json(degradedResponse(channels), {
+      return Response.json(degradedResponse(channels, lastUserMsg), {
         status: 200,
         headers: { "Cache-Control": "no-store" },
       });

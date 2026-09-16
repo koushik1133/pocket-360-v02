@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export function SiteMotion() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add("motion-ready");
@@ -12,54 +15,68 @@ export function SiteMotion() {
     ).matches;
 
     // ─── Reveal observer (data-reveal) ───────────────────────────────────────
-    const revealElements = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const observedReveals = new WeakSet<Element>();
 
-    if (prefersReduced) {
-      revealElements.forEach((el) => el.classList.add("is-visible"));
-    } else {
-      const revealObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-              revealObserver.unobserve(entry.target);
-            }
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
           }
-        },
-        { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
-      );
-      revealElements.forEach((el) => revealObserver.observe(el));
-      return () => revealObserver.disconnect();
-    }
-  }, []);
+        }
+      },
+      { rootMargin: "250px 0px 250px 0px", threshold: 0.001 },
+    );
 
-  // ─── Stagger observer (data-stagger) + nav active state ───────────────────
-  useEffect(() => {
-    const prefersReduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const observeAllReveals = () => {
+      const elements = document.querySelectorAll<HTMLElement>("[data-reveal]");
+      elements.forEach((el) => {
+        if (prefersReduced) {
+          el.classList.add("is-visible");
+        } else if (!observedReveals.has(el) && !el.classList.contains("is-visible")) {
+          observedReveals.add(el);
+          revealObserver.observe(el);
+        }
+      });
+    };
 
-    const staggerElements =
-      document.querySelectorAll<HTMLElement>("[data-stagger]");
+    observeAllReveals();
 
-    if (prefersReduced) {
-      staggerElements.forEach((el) => el.classList.add("is-visible"));
-    } else {
-      const staggerObserver = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-              staggerObserver.unobserve(entry.target);
-            }
+    // ─── Stagger observer (data-stagger) ─────────────────────────────────────
+    const observedStaggers = new WeakSet<Element>();
+
+    const staggerObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            staggerObserver.unobserve(entry.target);
           }
-        },
-        { rootMargin: "0px 0px -6% 0px", threshold: 0.05 },
-      );
-      staggerElements.forEach((el) => staggerObserver.observe(el));
-      return () => staggerObserver.disconnect();
-    }
-  }, []);
+        }
+      },
+      { rootMargin: "250px 0px 250px 0px", threshold: 0.001 },
+    );
+
+    const observeAllStaggers = () => {
+      const elements = document.querySelectorAll<HTMLElement>("[data-stagger]");
+      elements.forEach((el) => {
+        if (prefersReduced) {
+          el.classList.add("is-visible");
+        } else if (!observedStaggers.has(el) && !el.classList.contains("is-visible")) {
+          observedStaggers.add(el);
+          staggerObserver.observe(el);
+        }
+      });
+    };
+
+    observeAllStaggers();
+
+    return () => {
+      revealObserver.disconnect();
+      staggerObserver.disconnect();
+    };
+  }, [pathname]);
 
   // ─── Active nav section tracking ─────────────────────────────────────────
   useEffect(() => {
@@ -95,7 +112,6 @@ export function SiteMotion() {
 
     const sectionObserver = new IntersectionObserver(
       (entries) => {
-        // Find the topmost intersecting section
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -110,34 +126,43 @@ export function SiteMotion() {
     return () => sectionObserver.disconnect();
   }, []);
 
-  // ─── Hero panel subtle parallax on scroll ────────────────────────────────
+  // ─── Multi-speed Parallax on data-parallax-speed elements ────────────────
   useEffect(() => {
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReduced) return;
 
-    const panels = document.querySelectorAll<HTMLElement>(".hero__panel img");
-    if (panels.length === 0) return;
+    const parallaxItems = document.querySelectorAll<HTMLElement>("[data-parallax-speed]");
+    if (parallaxItems.length === 0) return;
+
+    let rafId: number;
 
     const onScroll = () => {
       const scrollY = window.scrollY;
       const vh = window.innerHeight;
-      if (scrollY > vh * 1.2) return; // only within hero range
 
-      const progress = scrollY / vh;
-      panels.forEach((panel, i) => {
-        const direction = i % 2 === 0 ? 1 : -1;
-        const offset = progress * 24 * direction;
-        panel.style.transform = `translateY(${offset}px) scale(1)`;
+      parallaxItems.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < vh + 100 && rect.bottom > -100) {
+          const speed = parseFloat(el.getAttribute("data-parallax-speed") || "0.1");
+          const offset = (scrollY - (rect.top + scrollY - vh / 2)) * speed * 0.15;
+          el.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+        }
       });
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const loop = () => {
+      onScroll();
+      rafId = requestAnimationFrame(loop);
+    };
+
+    rafId = requestAnimationFrame(loop);
+
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      panels.forEach((panel) => {
-        panel.style.transform = "";
+      cancelAnimationFrame(rafId);
+      parallaxItems.forEach((el) => {
+        el.style.transform = "";
       });
     };
   }, []);

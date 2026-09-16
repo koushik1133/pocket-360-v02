@@ -9,6 +9,7 @@ import {
   ArrowUpRightIcon,
   CloseIcon,
 } from "@/components/icons";
+import { RallyGallery } from "@/components/rally-gallery";
 
 const categories: readonly ("All" | WorkCategory)[] = [
   "All",
@@ -19,6 +20,7 @@ const categories: readonly ("All" | WorkCategory)[] = [
 ];
 
 export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
+  const [viewMode, setViewMode] = useState<"grid" | "rally">("grid");
   const [filter, setFilter] = useState<(typeof categories)[number]>("All");
   const [activeId, setActiveId] = useState<string | null>(null);
   const [closing, setClosing] = useState(false);
@@ -73,64 +75,126 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
     };
   }, [activeIndex, activeItem, showAt]);
 
-  return (
-    <>
-      <div
-        className="work-filters"
-        aria-label="Filter by category"
-        role="group"
-      >
-        {categories.map((category) => (
-          <button
-            type="button"
-            key={category}
-            className={filter === category ? "is-active" : ""}
-            aria-pressed={filter === category}
-            onClick={() => setFilter(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+  const handleSelectItem = (item: WorkItem) => {
+    setActiveId(item.id);
+  };
 
-      <div className="work-grid">
-        {filtered.map((item, index) => (
-          <article
-            key={item.id}
-            className={`work-card work-card--${(index % 6) + 1}`}
-            data-reveal
-          >
+  return (
+    <div className="work-gallery-root">
+      {/* Gallery Controls: Category Filters & Presentation Toggle */}
+      <div className="work-controls flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div
+          className="work-filters"
+          aria-label="Filter by category"
+          role="group"
+        >
+          {categories.map((category) => (
             <button
               type="button"
-              className="work-card__button"
-              onClick={(event) => {
-                triggerRef.current = event.currentTarget;
-                setActiveId(item.id);
-              }}
-              aria-label={`View ${item.title}`}
+              key={category}
+              className={filter === category ? "is-active" : ""}
+              aria-pressed={filter === category}
+              onClick={() => setFilter(category)}
             >
-              <Image
-                src={item.image}
-                alt={item.alt}
-                fill
-                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 34vw"
-                className="work-card__image"
-              />
-              <span className="work-card__shade" />
-              <span className="work-card__meta">
-                <span>
-                  <small>{item.category}</small>
-                  <strong>{item.title}</strong>
-                </span>
-                <span className="work-card__arrow">
-                  <ArrowUpRightIcon size={22} />
-                </span>
-              </span>
+              {category}
             </button>
-          </article>
-        ))}
+          ))}
+        </div>
+
+        <div
+          className="work-view-toggle hidden md:inline-flex p-1 rounded-full bg-paper border border-line"
+          role="radiogroup"
+          aria-label="Gallery view mode"
+        >
+          <button
+            type="button"
+            className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+              viewMode === "grid"
+                ? "is-active"
+                : "text-muted hover:text-ink"
+            }`}
+            onClick={() => setViewMode("grid")}
+            aria-checked={viewMode === "grid"}
+            role="radio"
+          >
+            Index Grid
+          </button>
+          <button
+            type="button"
+            className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
+              viewMode === "rally"
+                ? "is-active"
+                : "text-muted hover:text-ink"
+            }`}
+            onClick={() => setViewMode("rally")}
+            aria-checked={viewMode === "rally"}
+            role="radio"
+          >
+            Rally Wall
+          </button>
+        </div>
       </div>
 
+      {/* Main Gallery Display */}
+      {/* Mobile view (< 768px): Always show the horizontal Rally Wall */}
+      <div className="block md:hidden w-full max-w-full overflow-hidden">
+        <RallyGallery
+          items={filtered.length > 0 ? filtered : items}
+          onSelectItem={handleSelectItem}
+        />
+      </div>
+
+      {/* Desktop view (>= 768px): Switchable between Rally Wall and Index Grid */}
+      <div className="hidden md:block w-full">
+        {viewMode === "rally" ? (
+          <div className="rally-presentation-wrapper w-full max-w-full overflow-hidden">
+            <RallyGallery
+              items={filtered.length > 0 ? filtered : items}
+              onSelectItem={handleSelectItem}
+            />
+          </div>
+        ) : (
+          <div className="work-grid">
+            {filtered.map((item, index) => (
+              <article
+                key={item.id}
+                className={`work-card work-card--${(index % 6) + 1}`}
+              >
+                <button
+                  type="button"
+                  className="work-card__button"
+                  onClick={(event) => {
+                    triggerRef.current = event.currentTarget;
+                    setActiveId(item.id);
+                  }}
+                  data-cursor="VIEW REEL"
+                  aria-label={`View ${item.title}`}
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.alt}
+                    fill
+                    sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 34vw"
+                    className="work-card__image"
+                  />
+                  <span className="work-card__shade" />
+                  <span className="work-card__meta">
+                    <span>
+                      <small>{item.category}</small>
+                      <strong>{item.title}</strong>
+                    </span>
+                    <span className="work-card__arrow">
+                      <ArrowUpRightIcon size={22} />
+                    </span>
+                  </span>
+                </button>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Lightbox Modal (Shared between both views) */}
       {activeItem ? (
         <div
           className={`lightbox${closing ? " lightbox--closing" : ""}`}
@@ -210,6 +274,6 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { navigation } from "@/content/site";
 import { ArrowUpRightIcon, CloseIcon, MenuIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
+import { Magnetic } from "@/motion/magnetic";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,10 +39,10 @@ export function SiteHeader() {
   return (
     <>
       <header
-        className={`site-header ${compact ? "site-header--compact" : ""}`}
+        className={`site-header ${compact ? "site-header--compact backdrop-blur-md bg-ivory/85 border-b border-line/50 shadow-sm" : "bg-transparent"}`}
         data-open={menuOpen ? "true" : "false"}
       >
-        <div className="site-header__inner">
+        <div className="site-header__inner page-shell flex items-center justify-between">
           <Logo />
 
           <nav className="desktop-nav" aria-label="Primary navigation">
@@ -52,11 +53,13 @@ export function SiteHeader() {
             ))}
           </nav>
 
-          <div className="site-header__actions">
-            <Link className="button button--dark header-book" href="/book">
-              Book an appointment
-              <ArrowUpRightIcon size={16} />
-            </Link>
+          <div className="site-header__actions flex items-center gap-3">
+            <Magnetic strength={0.3}>
+              <Link className="button button--dark header-book" href="/book">
+                Book an appointment
+                <ArrowUpRightIcon size={16} />
+              </Link>
+            </Magnetic>
             <button
               type="button"
               className="menu-toggle"

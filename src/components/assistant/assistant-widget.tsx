@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   CalendarIcon,
   CloseIcon,
+  FileTextIcon,
   InstagramIcon,
   MailIcon,
   MicIcon,
   PhoneIcon,
+  PlayIcon,
+  ShieldIcon,
   SoundOffIcon,
   SoundOnIcon,
   SparklesIcon,
@@ -92,6 +95,7 @@ export function AssistantWidget({
     output: false,
   });
 
+  const pathname = usePathname();
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const stopDictationRef = useRef<(() => void) | null>(null);
@@ -128,6 +132,13 @@ export function AssistantWidget({
     setListening(false);
     stopSpeaking();
   }, []);
+
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    setOpen(false);
+    setListening(false);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -199,6 +210,60 @@ export function AssistantWidget({
               href: brand.instagramUrl,
               external: true,
               Icon: InstagramIcon,
+            });
+            break;
+          case "privacy":
+            resolved.push({
+              key: `privacy-${resolved.length}`,
+              label: action.label || "Open Privacy Policy",
+              href: "/privacy",
+              external: false,
+              Icon: ShieldIcon,
+            });
+            break;
+          case "terms":
+            resolved.push({
+              key: `terms-${resolved.length}`,
+              label: action.label || "Terms & Conditions",
+              href: "/terms",
+              external: false,
+              Icon: FileTextIcon,
+            });
+            break;
+          case "work":
+            resolved.push({
+              key: `work-${resolved.length}`,
+              label: action.label || "View Portfolio",
+              href: "/#work",
+              external: false,
+              Icon: PlayIcon,
+            });
+            break;
+          case "about":
+            resolved.push({
+              key: `about-${resolved.length}`,
+              label: action.label || "About Pocket Reels",
+              href: "/#about",
+              external: false,
+              Icon: SparklesIcon,
+            });
+            break;
+          case "contact":
+            resolved.push({
+              key: `contact-${resolved.length}`,
+              label: action.label || "Contact Us",
+              href: "/#contact",
+              external: false,
+              Icon: MailIcon,
+            });
+            break;
+          case "services":
+            resolved.push({
+              key: `services-${resolved.length}`,
+              label: action.label || "Explore Services",
+              href: "/#services",
+              external: false,
+              Icon: SparklesIcon,
             });
             break;
         }
@@ -422,21 +487,12 @@ export function AssistantWidget({
                             <action.Icon size={16} />
                             <span>{action.label}</span>
                           </a>
-                        ) : action.href.startsWith("/") ? (
-                          <Link
-                            key={action.key}
-                            className="assistant-action"
-                            href={action.href}
-                            onClick={closePanel}
-                          >
-                            <action.Icon size={16} />
-                            <span>{action.label}</span>
-                          </Link>
                         ) : (
                           <a
                             key={action.key}
                             className="assistant-action"
                             href={action.href}
+                            onClick={closePanel}
                           >
                             <action.Icon size={16} />
                             <span>{action.label}</span>

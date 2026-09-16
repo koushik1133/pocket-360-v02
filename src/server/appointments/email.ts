@@ -1,7 +1,6 @@
 import "server-only";
 
 import type { AppointmentRecord } from "@/server/appointments/repository";
-import { serviceLabel } from "@/lib/appointment-schema";
 import { env } from "@/env";
 
 export type EmailDelivery = {
@@ -40,12 +39,18 @@ function formattedTime(value: string) {
 
 function emailShell(title: string, intro: string, record: AppointmentRecord) {
   const details = [
-    ["Service", serviceLabel(record.service)],
-    ["Date", formattedDate(record.date)],
-    ["Preferred time", formattedTime(record.time)],
-    ["Name", record.name],
-    ["Phone", record.phone],
-    ["Email", record.email],
+    ["Package Type", record.packageType || "Wedding & Event Reels"],
+    ["Date of Event", formattedDate(record.date)],
+    ["Preferred Time to Call", record.preferredTimeToCall || formattedTime(record.time)],
+    ["Full Name", record.name],
+    ["Contact Number", record.phone],
+    ["Email Address", record.email],
+    [
+      "Location / Venue",
+      [record.locationVenue, record.city, record.state, record.country]
+        .filter(Boolean)
+        .join(", ") || "To be confirmed",
+    ],
   ];
 
   const detailRows = details
@@ -64,7 +69,7 @@ function emailShell(title: string, intro: string, record: AppointmentRecord) {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td align="center" style="padding:32px 16px">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#fffdf9;border-radius:18px;overflow:hidden">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#fffdf9;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.06)">
             <tr>
               <td style="padding:30px 34px;background:#11100f;color:#fffaf2">
                 <div style="display:inline-block;border:1px solid #fffaf2;border-radius:999px;padding:7px 10px;color:#d92027;margin-right:10px">▶</div>
@@ -73,17 +78,22 @@ function emailShell(title: string, intro: string, record: AppointmentRecord) {
             </tr>
             <tr>
               <td style="padding:40px 34px">
-                <p style="margin:0 0 12px;color:#940111;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase">Appointment</p>
-                <h1 style="margin:0;font-size:34px;line-height:1.08;font-weight:600;letter-spacing:-1px">${escapeHtml(title)}</h1>
-                <p style="margin:18px 0 28px;color:#625d57;font-size:15px;line-height:1.65">${escapeHtml(intro)}</p>
+                <p style="margin:0 0 12px;color:#940111;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase">✨ Booking Inquiry Received</p>
+                <h1 style="margin:0;font-size:32px;line-height:1.12;font-weight:600;letter-spacing:-0.5px">${escapeHtml(title)}</h1>
+                <p style="margin:18px 0 28px;color:#524d47;font-size:15px;line-height:1.65">${escapeHtml(intro)}</p>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   ${detailRows}
                 </table>
-                <div style="margin-top:28px;padding:18px;background:#f5f0e9;border-radius:12px">
-                  <p style="margin:0 0 6px;color:#716b64;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Project details</p>
-                  <p style="margin:0;color:#11100f;font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(record.projectDetails || "No additional project details provided.")}</p>
+                <div style="margin-top:28px;padding:20px;background:#f5f0e9;border-radius:12px;border-left:4px solid #b53526">
+                  <p style="margin:0 0 6px;color:#716b64;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Event Details &amp; Vision</p>
+                  <p style="margin:0;color:#11100f;font-size:14px;line-height:1.6;white-space:pre-wrap">${escapeHtml(record.eventDetails || record.projectDetails || "No additional event details provided.")}</p>
                 </div>
-                <p style="margin:28px 0 0;color:#817a72;font-size:12px">Reference: ${escapeHtml(record.id)}</p>
+                <div style="margin-top:28px;padding:16px;background:#ede7de;border-radius:10px;text-align:center">
+                  <p style="margin:0;color:#2b2826;font-size:13px;font-weight:600">
+                    ⚡ 24hr Guaranteed Review &bull; 💎 Clear Transparent Packages &bull; 📱 Shot in 4K HDR
+                  </p>
+                </div>
+                <p style="margin:28px 0 0;color:#817a72;font-size:12px">Inquiry Reference ID: ${escapeHtml(record.id)}</p>
               </td>
             </tr>
           </table>
@@ -146,20 +156,20 @@ export async function sendAppointmentEmails(
   const [customer, internal] = await Promise.allSettled([
     sendResendEmail({
       to: record.email,
-      subject: "Your Pocket Reels 360 appointment request",
+      subject: "✨ We received your reel inquiry — Pocket Reels 360",
       html: emailShell(
-        "Your appointment request is in.",
-        "We received your preferred date and time. The Pocket Reels crew will contact you to confirm the details.",
+        "Let's make your story unforgettable.",
+        "Thank you for reaching out! We are thrilled to collaborate with you. Our production team is currently reviewing your event details, location, and creative vision. We will follow up with confirmation and personalized recommendations within 24 hours.",
         record,
       ),
       replyTo: env.APPOINTMENT_NOTIFY_EMAIL,
     }),
     sendResendEmail({
       to: env.APPOINTMENT_NOTIFY_EMAIL,
-      subject: `New appointment request — ${record.name}`,
+      subject: `New appointment enquiry — ${record.name} (${record.packageType || "Reel Production"})`,
       html: emailShell(
-        "A new appointment request.",
-        "Review the project details below and contact the customer to confirm.",
+        `New Inquiry: ${record.name}`,
+        "A client has submitted an inquiry for reel production. Please review their details and respond within 24 hours.",
         record,
       ),
       replyTo: record.email,

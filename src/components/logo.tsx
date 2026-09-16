@@ -56,10 +56,10 @@ export function Logo({
   return (
     <Link
       href={href}
-      className={`logo ${light ? "logo--light" : ""} ${className}`}
+      className={`logo ${light ? "logo--light" : ""} ${className} group`}
       aria-label="Pocket Reels 360 home"
     >
-      <LogoMark className="logo__mark" />
+      <LogoMark className="logo__mark transition-transform duration-500 group-hover:rotate-45" />
       {!compact ? (
         <span className="logo__wordmark">
           <span>POCKET</span>
@@ -69,5 +69,26 @@ export function Logo({
         </span>
       ) : null}
     </Link>
+  );
+}
+
+export function FooterWordmark() {
+  return (
+    <div className="footer-wordmark select-none w-full max-w-full overflow-hidden text-center py-6">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-4 flex-wrap max-w-full">
+        <span className="text-2xl min-[360px]:text-3xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-white/90">
+          PO
+        </span>
+        <span className="inline-flex items-center justify-center text-accent w-6 h-6 min-[360px]:w-8 min-[360px]:h-8 sm:w-16 sm:h-16 md:w-20 md:h-20 -my-1 sm:-my-2">
+          <LogoMark className="w-full h-full animate-spin-slow" />
+        </span>
+        <span className="text-2xl min-[360px]:text-3xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-white/90">
+          KETREELS
+        </span>
+        <span className="text-2xl min-[360px]:text-3xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-accent font-serif italic">
+          360
+        </span>
+      </div>
+    </div>
   );
 }
