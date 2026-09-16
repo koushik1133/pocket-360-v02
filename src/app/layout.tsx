@@ -21,20 +21,36 @@ export const metadata: Metadata = {
     "Pocket Reels 360 is a reel-maker crew that shoots on iPhone, edits, and delivers across Dallas, NYC, Chicago, and Charlotte.",
   keywords: [
     "Pocket Reels 360",
-    "reel maker",
-    "iPhone reels",
-    "creative video",
-    "Dallas reels",
-    "event reels",
+    "reel maker Dallas",
+    "iPhone reels NYC",
+    "creative video Chicago",
+    "event reels Charlotte",
+    "wedding reels production",
+    "concert videography iPhone",
+    "luxury real estate reels",
+    "vertical video production",
+    "4K ProRes iPhone video",
+    "social media video crew",
   ],
+  authors: [{ name: "Pocket Reels 360" }, { name: "KVS Developers" }],
+  creator: "Pocket Reels 360",
+  publisher: "Pocket Reels 360",
+  category: "Video Production",
   alternates: { canonical: "/" },
+  other: {
+    "geo.region": "US-TX",
+    "geo.placename": "Dallas",
+    "geo.position": "32.7767;-96.7970",
+    "ICBM": "32.7767, -96.7970",
+    "coverage": "Dallas, New York City, Chicago, Charlotte, United States",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: brand.name,
-    title: "Pocket Reels 360 | Your spotlight, in motion",
+    title: "Pocket Reels 360 | iPhone Reels & Creative Video Production",
     description:
-      "A reel-maker crew that shoots, edits, and delivers hassle-free.",
+      "A premier reel-maker crew shooting exclusively on iPhone in 4K ProRes across Dallas, NYC, Chicago, and Charlotte. 24-48hr turnaround.",
     url: "/",
     images: [
       {
@@ -47,9 +63,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pocket Reels 360 | Your spotlight, in motion",
+    title: "Pocket Reels 360 | iPhone Reels & Creative Video Production",
     description:
-      "A reel-maker crew that shoots, edits, and delivers hassle-free.",
+      "A premier reel-maker crew shooting exclusively on iPhone in 4K ProRes across Dallas, NYC, Chicago, and Charlotte.",
     images: ["/opengraph-image"],
   },
   icons: {
@@ -69,15 +85,84 @@ export const viewport: Viewport = {
 
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": "Organization",
-  name: brand.name,
-  url: env.NEXT_PUBLIC_SITE_URL,
-  description: brand.description,
-  sameAs: [brand.instagramUrl, brand.youtubeUrl],
-  areaServed: brand.locations.map((name) => ({
-    "@type": "City",
-    name,
-  })),
+  "@graph": [
+    {
+      "@type": "ProfessionalService",
+      "@id": `${env.NEXT_PUBLIC_SITE_URL}/#organization`,
+      name: brand.name,
+      url: env.NEXT_PUBLIC_SITE_URL,
+      logo: `${env.NEXT_PUBLIC_SITE_URL}/logo-mark.svg`,
+      image: `${env.NEXT_PUBLIC_SITE_URL}/opengraph-image`,
+      description: brand.description,
+      priceRange: "$$",
+      telephone: env.NEXT_PUBLIC_CONTACT_PHONE || "+1-469-555-0199",
+      email: env.NEXT_PUBLIC_CONTACT_EMAIL || "koushik.lf38@gmail.com",
+      sameAs: [brand.instagramUrl, brand.youtubeUrl],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Dallas",
+        addressRegion: "TX",
+        addressCountry: "US",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 32.7767,
+        longitude: -96.797,
+      },
+      areaServed: [
+        {
+          "@type": "City",
+          name: "Dallas",
+          containedInPlace: { "@type": "State", name: "Texas" },
+        },
+        {
+          "@type": "City",
+          name: "New York City",
+          containedInPlace: { "@type": "State", name: "New York" },
+        },
+        {
+          "@type": "City",
+          name: "Chicago",
+          containedInPlace: { "@type": "State", name: "Illinois" },
+        },
+        {
+          "@type": "City",
+          name: "Charlotte",
+          containedInPlace: { "@type": "State", name: "North Carolina" },
+        },
+      ],
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Pocket Reels 360 Video Production Services",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Wedding & Reception Reels",
+              description: "High-paced, vertical 4K iPhone coverage for weddings and milestones.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Live Concerts & Events Reels",
+              description: "Agile on-stage and crowd capture with pro wireless audio.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Brand & Commercial Launch Reels",
+              description: "Architectural, corporate, and retail brand story campaigns.",
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
