@@ -153,10 +153,12 @@ export async function sendAppointmentEmails(
     return { configured: false, customerSent: false, internalSent: false };
   }
 
+  const refCode = `PR-${record.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+
   const [customer, internal] = await Promise.allSettled([
     sendResendEmail({
       to: record.email,
-      subject: "✨ We received your reel inquiry — Pocket Reels 360",
+      subject: `✨ Booking Inquiry Confirmed [${refCode}] — ${record.name} (${record.packageType || record.service})`,
       html: emailShell(
         "Let's make your story unforgettable.",
         "Thank you for reaching out! We are thrilled to collaborate with you. Our production team is currently reviewing your event details, location, and creative vision. We will follow up with confirmation and personalized recommendations within 24 hours.",
@@ -166,9 +168,9 @@ export async function sendAppointmentEmails(
     }),
     sendResendEmail({
       to: env.APPOINTMENT_NOTIFY_EMAIL,
-      subject: `New appointment enquiry — ${record.name} (${record.packageType || "Reel Production"})`,
+      subject: `New Booking [${refCode}]: ${record.name} · ${record.date} at ${record.preferredTimeToCall || record.time}`,
       html: emailShell(
-        `New Inquiry: ${record.name}`,
+        `New Inquiry: ${record.name} [${refCode}]`,
         "A client has submitted an inquiry for reel production. Please review their details and respond within 24 hours.",
         record,
       ),

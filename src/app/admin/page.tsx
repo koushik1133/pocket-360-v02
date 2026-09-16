@@ -359,7 +359,7 @@ export default function AdminDashboardPage() {
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5 text-white/60 uppercase tracking-wider font-mono text-[10px]">
-                      <th className="p-4">Date &amp; Time</th>
+                      <th className="p-4">Ref &amp; Date</th>
                       <th className="p-4">Client</th>
                       <th className="p-4">Package</th>
                       <th className="p-4">Location</th>
@@ -370,8 +370,9 @@ export default function AdminDashboardPage() {
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {filteredAppointments.map((apt) => {
-                      const waLink = `https://wa.me/${apt.phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi ${apt.name}, this is Pocket Reels 360 regarding your reel booking enquiry for ${apt.packageType || "our production"}.`)}`;
-                      const mailLink = `mailto:${apt.email}?subject=${encodeURIComponent(`Pocket Reels 360 Booking: ${apt.packageType || "Production"}`)}`;
+                      const refCode = `PR-${apt.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+                      const waLink = `https://wa.me/${apt.phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi ${apt.name}, this is Pocket Reels 360 regarding your booking enquiry [${refCode}] for ${apt.packageType || "our production"}.`)}`;
+                      const mailLink = `mailto:${apt.email}?subject=${encodeURIComponent(`[${refCode}] Pocket Reels 360 Booking: ${apt.packageType || "Production"}`)}`;
 
                       return (
                         <tr
@@ -379,6 +380,9 @@ export default function AdminDashboardPage() {
                           className="hover:bg-white/[0.03] transition-colors"
                         >
                           <td className="p-4 font-mono">
+                            <span className="inline-block px-2 py-0.5 rounded bg-white/10 text-white/90 text-[10px] font-semibold tracking-wider mb-1">
+                              {refCode}
+                            </span>
                             <strong className="text-white block text-sm">
                               {apt.date}
                             </strong>
@@ -475,13 +479,19 @@ export default function AdminDashboardPage() {
               {/* Mobile Card List */}
               <div className="md:hidden divide-y divide-white/5">
                 {filteredAppointments.map((apt) => {
-                  const waLink = `https://wa.me/${apt.phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi ${apt.name}, this is Pocket Reels 360 regarding your reel booking enquiry for ${apt.packageType || "our production"}.`)}`;
-                  const mailLink = `mailto:${apt.email}?subject=${encodeURIComponent(`Pocket Reels 360 Booking: ${apt.packageType || "Production"}`)}`;
+                  const refCode = `PR-${apt.id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+                  const waLink = `https://wa.me/${apt.phone.replace(/[^\d]/g, "")}?text=${encodeURIComponent(`Hi ${apt.name}, this is Pocket Reels 360 regarding your booking enquiry [${refCode}] for ${apt.packageType || "our production"}.`)}`;
+                  const mailLink = `mailto:${apt.email}?subject=${encodeURIComponent(`[${refCode}] Pocket Reels 360 Booking: ${apt.packageType || "Production"}`)}`;
 
                   return (
                     <div key={apt.id} className="p-4 hover:bg-white/[0.03] transition-colors">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-1.5 py-0.5 rounded bg-white/10 text-white/80 font-mono text-[9px] font-semibold">
+                              {refCode}
+                            </span>
+                          </div>
                           <strong className="text-white block font-medium text-sm">{apt.name}</strong>
                           <span className="text-white/50 text-[11px] block">{apt.phone}</span>
                           <span className="text-white/40 text-[11px] block">{apt.email}</span>
@@ -547,7 +557,12 @@ export default function AdminDashboardPage() {
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#181615] border border-white/15 rounded-3xl p-5 sm:p-8 max-w-lg w-full max-h-[85dvh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
-              <h3 className="text-lg font-bold text-white">Booking Details</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-white">Booking Details</h3>
+                <span className="px-2 py-0.5 rounded bg-accent/20 border border-accent/40 text-accent font-mono text-xs font-semibold">
+                  PR-{selectedBooking.id.replace(/-/g, "").slice(0, 6).toUpperCase()}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setSelectedBooking(null)}
