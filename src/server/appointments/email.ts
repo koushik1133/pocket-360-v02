@@ -243,39 +243,40 @@ export async function sendAppointmentEmails(
   const internalSubject = `📨 New Booking [${ref}]: ${record.name} — ${record.packageType || DEFAULT_PACKAGE_TYPE}`;
   const internalText = internalNotificationText(record, ref);
 
-  if (!canEmailClients()) {
-    // Resend sandbox: only the account owner can receive mail. Send one internal
-    // email that carries the client's draft so the crew can forward it.
-    const combined = `${internalText}\n\n---\nClient confirmation to forward to ${record.email}:\n\n${confirmation.body}`;
-    const internalSent = await sendEmail({
+  // 1. ALWAYS attempt to send confirmation directly to the client's email:
+  const customerSent = await sendEmail({
+    to: record.email,
+    subject: confirmation.subject,
+    text: confirmation.body,
+    html: brandedHtml(confirmation.body),
+    replyTo: internalTo,
+  });
+
+  // 2. Send internal notification to admin:
+  let internalSent = false;
+  if (customerSent) {
+    internalSent = await sendEmail({
+      to: internalTo,
+      subject: internalSubject,
+      text: internalText,
+      html: brandedHtml(internalText, "Internal notification from the booking form. Client confirmation was emailed directly to the client."),
+      replyTo: record.email,
+    });
+  } else {
+    // If client direct email failed (e.g. Resend free sandbox unverified domain),
+    // provide the pre-rendered client confirmation draft in the admin's notification so it can be forwarded instantly:
+    const combined = `${internalText}\n\n---\nClient confirmation draft (forward to ${record.email}):\n\n${confirmation.body}`;
+    internalSent = await sendEmail({
       to: internalTo,
       subject: internalSubject,
       text: combined,
       html: brandedHtml(
         combined,
-        "Internal notification. Add GMAIL_USER + GMAIL_APP_PASSWORD (or a verified Resend domain) to email clients directly.",
+        "Internal notification. Note: Direct client email delivery required domain verification on Resend or Gmail App Password; draft provided above for quick forwarding.",
       ),
       replyTo: record.email,
     });
-    return { configured: true, transport, customerSent: false, internalSent };
   }
-
-  const [customerSent, internalSent] = await Promise.all([
-    sendEmail({
-      to: record.email,
-      subject: confirmation.subject,
-      text: confirmation.body,
-      html: brandedHtml(confirmation.body),
-      replyTo: internalTo,
-    }),
-    sendEmail({
-      to: internalTo,
-      subject: internalSubject,
-      text: internalText,
-      html: brandedHtml(internalText, "Internal notification from the booking form."),
-      replyTo: record.email,
-    }),
-  ]);
 
   return { configured: true, transport, customerSent, internalSent };
 }

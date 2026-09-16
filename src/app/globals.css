@@ -3150,11 +3150,32 @@ h3 {
   }
 }
 
+/* ---------- Cookie Consent Banner ---------- */
+.cookie-consent-banner {
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transition: bottom 250ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+body:has(.mobile-action-bar) .cookie-consent-banner {
+  bottom: calc(4.65rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 641px) {
+  .cookie-consent-banner {
+    left: auto;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    max-width: 26rem;
+  }
+}
+
 /* ---------- AI assistant widget ---------- */
 .assistant-launcher {
   position: fixed;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(5.25rem, calc(env(safe-area-inset-bottom) + 5rem));
+  right: max(1.25rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 1rem));
   z-index: 90;
   min-height: 3.25rem;
   display: inline-flex;
@@ -3171,6 +3192,8 @@ h3 {
   text-transform: uppercase;
   cursor: pointer;
   transition:
+    bottom 250ms var(--ease-out),
+    right 250ms var(--ease-out),
     transform 150ms var(--ease-out),
     background 150ms var(--ease-out);
 }
@@ -3180,15 +3203,21 @@ h3 {
   background: var(--color-assistant-red-hover);
 }
 
+/* On desktop, when cookie banner is active, place assistant button neatly above it */
+html[data-cookie-banner="active"] .assistant-launcher,
+body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
+  bottom: calc(14rem + env(safe-area-inset-bottom));
+}
+
 .assistant-panel {
   position: fixed;
   right: max(1rem, env(safe-area-inset-right));
-  bottom: max(5.25rem, calc(env(safe-area-inset-bottom) + 5rem));
+  bottom: max(1.25rem, calc(env(safe-area-inset-bottom) + 1rem));
   z-index: 95;
   display: flex;
   flex-direction: column;
   width: min(24.5rem, calc(100vw - 2rem));
-  height: min(37rem, calc(100dvh - 8rem));
+  height: min(37rem, calc(100dvh - 4rem));
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-lg);
@@ -3501,31 +3530,48 @@ h3 {
 @media (max-width: 700px) {
   .assistant-launcher {
     right: 0.85rem;
-    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    bottom: max(0.95rem, calc(env(safe-area-inset-bottom) + 0.85rem));
     padding: 0.6rem 0.95rem;
     font-size: 0.62rem;
     min-height: 2.85rem;
   }
 
+  /* When mobile action bar is present (e.g. homepage), sit above it */
+  body:has(.mobile-action-bar) .assistant-launcher {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* When cookie banner is active on mobile without action bar (e.g. /book) */
+  html[data-cookie-banner="active"] .assistant-launcher,
+  body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
+    bottom: calc(12.5rem + env(safe-area-inset-bottom));
+  }
+
+  /* When BOTH mobile action bar and cookie banner are active */
+  body:has(.mobile-action-bar)[data-cookie-banner="active"] .assistant-launcher,
+  body:has(.mobile-action-bar):has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
+    bottom: calc(16.5rem + env(safe-area-inset-bottom));
+  }
+
   .assistant-panel {
     right: 0.65rem;
     left: 0.65rem;
-    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    bottom: max(0.85rem, calc(env(safe-area-inset-bottom) + 0.75rem));
     width: auto;
-    height: min(32rem, calc(100dvh - 8rem));
+    height: min(33rem, calc(100dvh - 3.5rem));
+  }
+
+  body:has(.mobile-action-bar) .assistant-panel {
+    bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    height: min(31rem, calc(100dvh - 6.5rem));
   }
 }
 
 body:has(.mobile-menu--open) .assistant-launcher,
 body:has(.mobile-menu--open) .assistant-panel,
 body:has(.mobile-menu--open) .mobile-action-bar,
+body:has(.mobile-menu--open) .cookie-consent-banner,
 body:has(.mobile-menu--open) [aria-label="Cookie and Privacy Choices"] {
-  display: none !important;
-}
-
-/* While cookie consent is visible, suppress assistant launcher to prevent overlap */
-html[data-cookie-banner="active"] .assistant-launcher,
-body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
   display: none !important;
 }
 
