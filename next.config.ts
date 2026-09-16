@@ -1,20 +1,15 @@
 import type { NextConfig } from "next";
 
-const scriptPolicy =
-  process.env.NODE_ENV === "development"
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : "script-src 'self' 'unsafe-inline'";
+const scriptPolicy = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
 
 const connectPolicy =
-  process.env.NODE_ENV === "development"
-    ? "connect-src 'self' ws: wss: https://api.resend.com https://api.groq.com"
-    : "connect-src 'self' https://api.resend.com https://api.groq.com";
+  "connect-src 'self' ws: wss: https://*.supabase.co wss://*.supabase.co https://api.resend.com https://api.groq.com";
 
 const csp = [
   "default-src 'self'",
   scriptPolicy,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://www.instagram.com https://scontent.cdninstagram.com",
+  "img-src 'self' data: blob: https://www.instagram.com https://scontent.cdninstagram.com https://*.supabase.co https://*.resend.com",
   "media-src 'self' blob:",
   "font-src 'self'",
   connectPolicy,
@@ -49,8 +44,8 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), interest-cohort=()",

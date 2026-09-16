@@ -170,54 +170,58 @@ async function createSupabaseAppointment(
   const supabase = getSupabaseClient();
   if (!supabase) return createLocalAppointment(input);
 
-  // Idempotency: check for existing record first
-  const { data: existing } = await supabase
-    .from("appointments")
-    .select("*")
-    .eq("idempotency_key", input.idempotencyKey)
-    .maybeSingle<SupabaseAppointmentRow>();
+  try {
+    // Idempotency: check for existing record first
+    const { data: existing } = await supabase
+      .from("appointments")
+      .select("*")
+      .eq("idempotency_key", input.idempotencyKey)
+      .maybeSingle<SupabaseAppointmentRow>();
 
-  if (existing) {
-    return { ok: true, record: fromSupabaseRow(existing), created: false };
-  }
+    if (existing) {
+      return { ok: true, record: fromSupabaseRow(existing), created: false };
+    }
 
-  // Slot conflict check
-  const { data: conflict } = await supabase
-    .from("appointments")
-    .select("id")
-    .eq("service", input.service)
-    .eq("appointment_date", input.date)
-    .eq("appointment_time", input.time)
-    .in("status", ["pending", "confirmed"])
-    .maybeSingle();
+    // Slot conflict check
+    const { data: conflict } = await supabase
+      .from("appointments")
+      .select("id")
+      .eq("service", input.service)
+      .eq("appointment_date", input.date)
+      .eq("appointment_time", input.time)
+      .in("status", ["pending", "confirmed"])
+      .maybeSingle();
 
-  if (conflict) {
-    return { ok: false, code: "SLOT_TAKEN" };
-  }
+    if (conflict) {
+      return { ok: false, code: "SLOT_TAKEN" };
+    }
 
-  const { data: inserted, error } = await supabase
-    .from("appointments")
-    .insert({
-      service: input.service,
-      appointment_date: input.date,
-      appointment_time: input.time,
-      name: input.name,
-      phone: input.phone,
-      email: input.email,
-      project_details: input.projectDetails,
-      status: "pending",
-      idempotency_key: input.idempotencyKey,
-    })
-    .select("*")
-    .single<SupabaseAppointmentRow>();
+    const { data: inserted, error } = await supabase
+      .from("appointments")
+      .insert({
+        service: input.service,
+        appointment_date: input.date,
+        appointment_time: input.time,
+        name: input.name,
+        phone: input.phone,
+        email: input.email,
+        project_details: input.projectDetails,
+        status: "pending",
+        idempotency_key: input.idempotencyKey,
+      })
+      .select("*")
+      .single<SupabaseAppointmentRow>();
 
-  if (error) {
-    console.error("[supabase] createAppointment error:", error);
-    // Fall back to local file if Supabase insert fails
+    if (error || !inserted) {
+      console.error("[supabase] createAppointment error:", error);
+      return createLocalAppointment(input);
+    }
+
+    return { ok: true, record: fromSupabaseRow(inserted), created: true };
+  } catch (err) {
+    console.error("[supabase] unexpected exception in createSupabaseAppointment:", err);
     return createLocalAppointment(input);
   }
-
-  return { ok: true, record: fromSupabaseRow(inserted), created: true };
 }
 
 // ─── Postgres helpers ─────────────────────────────────────────────────────────
@@ -347,17 +351,20 @@ export async function listAppointments(): Promise<AppointmentRecord[]> {
   // Supabase
   const supabase = getSupabaseClient();
   if (supabase) {
-    const { data, error } = await supabase
-      .from("appointments")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .returns<SupabaseAppointmentRow[]>();
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .returns<SupabaseAppointmentRow[]>();
 
-    if (error) {
-      console.error("[supabase] listAppointments error:", error);
-      return [];
+      if (!error && data) {
+        return data.map(fromSupabaseRow);
+      }
+      console.error("[supabase] listAppointments error, falling back:", error);
+    } catch (err) {
+      console.error("[supabase] listAppointments exception, falling back:", err);
     }
-    return (data ?? []).map(fromSupabaseRow);
   }
 
   // Postgres
