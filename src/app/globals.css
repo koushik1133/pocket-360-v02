@@ -2731,20 +2731,28 @@ h3 {
   }
 
   .hero__copy {
-    padding-top: 3.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
   }
 
   .hero h1 {
-    font-size: clamp(3.45rem, 17vw, 5.8rem);
+    font-size: clamp(3rem, 15vw, 5rem);
   }
 
   .hero__actions {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    margin-bottom: 1.25rem;
   }
 
   .hero__actions .button {
     width: 100%;
+  }
+
+  .hero__location {
+    margin-top: 1rem;
   }
 
   .hero__visual {
@@ -3473,16 +3481,33 @@ h3 {
 
 @media (max-width: 700px) {
   .assistant-launcher {
-    bottom: max(5.75rem, calc(env(safe-area-inset-bottom) + 5.25rem));
+    right: 0.85rem;
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    padding: 0.6rem 0.95rem;
+    font-size: 0.62rem;
+    min-height: 2.85rem;
   }
 
   .assistant-panel {
     right: 0.65rem;
     left: 0.65rem;
-    bottom: max(5.75rem, calc(env(safe-area-inset-bottom) + 5.25rem));
+    bottom: calc(4.75rem + env(safe-area-inset-bottom));
     width: auto;
-    height: min(34rem, calc(100dvh - 9rem));
+    height: min(32rem, calc(100dvh - 8rem));
   }
+}
+
+body:has(.mobile-menu--open) .assistant-launcher,
+body:has(.mobile-menu--open) .assistant-panel,
+body:has(.mobile-menu--open) .mobile-action-bar,
+body:has(.mobile-menu--open) [aria-label="Cookie and Privacy Choices"] {
+  display: none !important;
+}
+
+/* While cookie consent is visible, suppress assistant launcher to prevent overlap */
+html[data-cookie-banner="active"] .assistant-launcher,
+body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
