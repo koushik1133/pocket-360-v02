@@ -54,9 +54,10 @@ const schema = z.object({
       "DATABASE_URL must start with postgres",
     ),
   ALLOW_FILE_APPOINTMENTS: z
-    .enum(["true", "false"])
-    .default("false")
-    .transform((value) => value === "true"),
+    .string()
+    .optional()
+    .default("true")
+    .transform((value) => value !== "false"),
   RESEND_API_KEY: z
     .string()
     .optional()

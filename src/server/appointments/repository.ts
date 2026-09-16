@@ -44,7 +44,11 @@ function database() {
   return globalForDatabase.pocketReelsSql;
 }
 
-const localPath = path.join(process.cwd(), "data", "appointments.json");
+// On Vercel / serverless environments, root filesystem is read-only; /tmp is writable.
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const localPath = isServerless
+  ? path.join("/tmp", "appointments.json")
+  : path.join(process.cwd(), "data", "appointments.json");
 let localQueue: Promise<void> = Promise.resolve();
 
 async function withLocalLock<T>(task: () => Promise<T>): Promise<T> {
