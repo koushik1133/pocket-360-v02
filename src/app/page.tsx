@@ -11,6 +11,7 @@ import {
   ArrowRightIcon,
   ArrowUpRightIcon,
   InstagramIcon,
+  MailIcon,
   MapPinIcon,
   PlayIcon,
   WhatsAppIcon,
@@ -341,6 +342,85 @@ export default function HomePage() {
       {/* ─── Featured Spotlight Section with Scroll Zoom ─── */}
       <section className="featured section-pad overflow-hidden">
         {workItems[0] ? <FeaturedSpotlight item={workItems[0]} /> : null}
+      </section>
+
+      {/* ─── Editorial Booking Showcase ─── */}
+      <section className="booking-editorial section-pad">
+        <div className="page-shell booking-editorial__grid">
+          <div className="booking-editorial__gallery" data-reveal>
+            <div className="booking-editorial__main">
+              <Image
+                src="/media/reel-henna.jpg"
+                alt="Project inspiration preview"
+                fill
+                sizes="(max-width: 800px) 94vw, 48vw"
+              />
+            </div>
+            <div className="booking-editorial__thumbs">
+              <div>
+                <Image
+                  src="/media/reel-concert-aug28.jpg"
+                  alt="Live performance reel snapshot"
+                  fill
+                  sizes="22vw"
+                />
+              </div>
+              <div>
+                <Image
+                  src="/media/reel-aurum.jpg"
+                  alt="Luxury venue reel snapshot"
+                  fill
+                  sizes="22vw"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="booking-editorial__panel" data-reveal>
+            <p className="eyebrow">Appointments</p>
+            <h2>Put your next story in motion.</h2>
+            <p>
+              Share the moment, your preferred date and time, and the details
+              the crew should know.
+            </p>
+            <dl className="booking-editorial__details">
+              <div>
+                <dt>Service</dt>
+                <dd>Reel production</dd>
+              </div>
+              <div>
+                <dt>Flow</dt>
+                <dd>Shoot · Edit · Deliver</dd>
+              </div>
+              <div>
+                <dt>Where</dt>
+                <dd>Dallas · NYC · Chicago · Charlotte</dd>
+              </div>
+            </dl>
+            <Link className="button button--dark button--wide" href="/book">
+              Book an appointment
+              <ArrowUpRightIcon size={17} />
+            </Link>
+            <div className="booking-editorial__links">
+              {whatsapp ? (
+                <a href={whatsapp} target="_blank" rel="noreferrer">
+                  <WhatsAppIcon size={17} />
+                  WhatsApp us
+                </a>
+              ) : null}
+              {email ? (
+                <a href={email}>
+                  <MailIcon size={17} />
+                  Email us
+                </a>
+              ) : null}
+              <a href={brand.instagramUrl} target="_blank" rel="noreferrer">
+                <InstagramIcon size={17} />
+                Instagram DM
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ─── Production Scheduling Dark Rounded Card ─── */}
