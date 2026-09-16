@@ -93,7 +93,16 @@ function emailShell(title: string, intro: string, record: AppointmentRecord) {
                     ⚡ 24hr Guaranteed Review &bull; 💎 Clear Transparent Packages &bull; 📱 Shot in 4K HDR
                   </p>
                 </div>
-                <p style="margin:28px 0 0;color:#817a72;font-size:12px">Inquiry Reference ID: ${escapeHtml(record.id)}</p>
+                <div style="margin-top:32px;padding-top:20px;border-top:1px solid #e7e0d8;font-size:11px;color:#817a72;line-height:1.6">
+                  <p style="margin:0 0 6px"><strong>Pocket Reels 360</strong> · Dallas (HQ), NYC, Chicago, Charlotte</p>
+                  <p style="margin:0 0 6px">You received this email because an appointment inquiry was submitted at <a href="${escapeHtml(env.NEXT_PUBLIC_SITE_URL)}" style="color:#b53526;text-decoration:none">${escapeHtml(env.NEXT_PUBLIC_SITE_URL)}</a>.</p>
+                  <p style="margin:0">
+                    If this inquiry was submitted in error or you wish to cancel or unsubscribe from correspondence, simply reply to this email with "CANCEL" or contact us on Instagram <a href="https://www.instagram.com/pocketreels360/" style="color:#b53526;text-decoration:none">@pocketreels360</a>.
+                  </p>
+                  <p style="margin:8px 0 0;font-size:10px;color:#a8a197">
+                    Reference Code: ${escapeHtml(record.id.slice(0, 8).toUpperCase())} · Confidential &amp; Protected Under Applicable Privacy Laws
+                  </p>
+                </div>
               </td>
             </tr>
           </table>

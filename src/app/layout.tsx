@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteMotion } from "@/components/site-motion";
 import { LenisProvider } from "@/motion/lenis-provider";
 import { CustomCursor } from "@/motion/custom-cursor";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -105,6 +106,7 @@ export default function RootLayout({
             contactEmail={contact.contactEmail}
             contactPhone={contact.contactPhone}
           />
+          <CookieConsentBanner />
           <SiteMotion />
         </LenisProvider>
         <script

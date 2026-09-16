@@ -76,19 +76,28 @@ export function SiteFooter({
       </div>
 
       <div className="page-shell site-footer__bottom border-t border-white/10 pt-6">
-        <p className="text-xs text-white/50">© {new Date().getFullYear()} Pocket Reels 360 · All rights reserved.</p>
-        <div className="flex items-center gap-4 text-xs text-white/60">
-          <Link href="/privacy" className="hover:text-white">Privacy</Link>
-          <Link href="/terms" className="hover:text-white">Terms</Link>
-          <a
-            href={brand.instagramUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Pocket Reels 360 on Instagram"
-            className="hover:text-white"
-          >
-            <InstagramIcon size={18} />
-          </a>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-xs text-white/60">© {new Date().getFullYear()} Pocket Reels 360 · All rights reserved.</p>
+            <p className="text-[11px] text-white/40 mt-0.5">
+              Production Hubs: Dallas (HQ), NYC, Chicago, Charlotte · Shot on iPhone in 4K ProRes
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3.5 sm:gap-4 text-xs text-white/60">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
+            <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link>
+            <a
+              href={brand.instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Pocket Reels 360 on Instagram"
+              className="hover:text-white transition-colors ml-1"
+            >
+              <InstagramIcon size={18} />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

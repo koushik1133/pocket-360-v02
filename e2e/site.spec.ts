@@ -202,7 +202,7 @@ test("assistant handles privacy policy request and off-topic guardrails", async 
   // Verify navigation to /privacy
   await page.waitForURL("**/privacy");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Your appointment information/i);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Privacy Policy/i);
 
   // 2. Open assistant on /privacy and test off-topic guardrail
   const assistantOnPrivacy = page.getByRole("button", {

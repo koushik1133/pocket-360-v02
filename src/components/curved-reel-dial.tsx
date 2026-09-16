@@ -75,7 +75,7 @@ export function CurvedReelDial() {
         <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-white">
           Scroll through <em className="font-serif text-accent italic font-normal">the reels.</em>
         </h2>
-        <p className="text-white/60 text-xs sm:text-sm max-w-md mx-auto mt-2">
+        <p className="text-white/85 text-xs sm:text-sm max-w-md mx-auto mt-2 font-medium">
           Vertical 4K stories captured on iPhone. Center reels expand in full clarity as you explore.
         </p>
       </div>

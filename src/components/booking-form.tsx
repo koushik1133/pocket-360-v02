@@ -909,8 +909,42 @@ export function BookingForm({
                   </dd>
                 </div>
               </dl>
-              <p className="booking-summary__note mt-3">
-                Submitting this enquiry books your slot inquiry with Pocket Reels 360. We will reach out to confirm pricing, schedule, and team allocation.
+
+              <div className="mt-4 p-4 rounded-xl bg-paper/80 border border-line flex flex-col gap-3 text-xs text-ink-soft">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    defaultChecked
+                    className="mt-0.5 rounded border-line text-accent focus:ring-accent accent-accent w-4 h-4"
+                  />
+                  <span>
+                    I confirm that I am at least 18 years of age and authorized to book services for this event.
+                  </span>
+                </label>
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    defaultChecked
+                    className="mt-0.5 rounded border-line text-accent focus:ring-accent accent-accent w-4 h-4"
+                  />
+                  <span>
+                    I agree to the{" "}
+                    <a href="/terms" target="_blank" rel="noreferrer" className="text-accent underline font-semibold">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="/privacy" target="_blank" rel="noreferrer" className="text-accent underline font-semibold">
+                      Privacy Policy
+                    </a>
+                    . Pocket Reels 360 may contact me via email or phone regarding this booking inquiry.
+                  </span>
+                </label>
+              </div>
+
+              <p className="booking-summary__note mt-3 text-[11px] text-muted">
+                🛡️ Zero spam guarantee · No payment collected today · All inquiries reviewed within 24 hours.
               </p>
             </fieldset>
           ) : null}
