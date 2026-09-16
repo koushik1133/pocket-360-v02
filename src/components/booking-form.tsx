@@ -105,7 +105,7 @@ const steps = [
 
 const initialFields: BookingFields = {
   service: "reel-production",
-  packageType: "Wedding & Reception Reels",
+  packageType: "",
   name: "",
   phone: "",
   email: "",
@@ -114,8 +114,8 @@ const initialFields: BookingFields = {
   city: "",
   locationVenue: "",
   date: "",
-  time: "12:00",
-  preferredTimeToCall: "Morning (9:00 AM – 12:00 PM)",
+  time: "",
+  preferredTimeToCall: "",
   eventDetails: "",
   projectDetails: "",
   website: "",
@@ -126,6 +126,9 @@ const initialFields: BookingFields = {
 /** Consent flags are validated client-side only; the API schema does not accept them. */
 function submittableFields(fields: BookingFields) {
   const copy: Partial<BookingFields> = { ...fields };
+  if (!copy.time || copy.time.trim() === "") {
+    copy.time = "12:00";
+  }
   delete copy.ageConfirmed;
   delete copy.termsAccepted;
   return copy as Omit<BookingFields, "ageConfirmed" | "termsAccepted">;
@@ -601,7 +604,7 @@ export function BookingForm({
                           key={pkg.id}
                           className={`relative flex flex-col p-3.5 rounded-xl border cursor-pointer transition-all ${
                             isSelected
-                              ? "border-accent bg-accent-soft/30 shadow-xs"
+                              ? "border-accent bg-accent-soft/30 shadow-xs ring-1 ring-accent"
                               : "border-line bg-surface hover:border-ink/30"
                           }`}
                         >
@@ -614,14 +617,25 @@ export function BookingForm({
                             className="sr-only"
                           />
                           <div className="flex items-center justify-between mb-1">
-                            <strong className="text-xs sm:text-sm font-semibold text-ink">
-                              {pkg.name}
-                            </strong>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`w-4 h-4 rounded-full border flex items-center justify-center text-[9px] font-bold shrink-0 ${
+                                  isSelected
+                                    ? "border-accent bg-accent text-white"
+                                    : "border-line bg-paper text-transparent"
+                                }`}
+                              >
+                                ✓
+                              </span>
+                              <strong className="text-xs sm:text-sm font-semibold text-ink">
+                                {pkg.name}
+                              </strong>
+                            </div>
                             <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-paper border border-line text-ink">
                               {pkg.tag}
                             </span>
                           </div>
-                          <small className="text-[11px] text-ink leading-relaxed font-normal">
+                          <small className="text-[11px] text-ink leading-relaxed font-normal pl-6">
                             {pkg.desc}
                           </small>
                         </label>

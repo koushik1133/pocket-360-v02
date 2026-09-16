@@ -3,13 +3,13 @@ import { z } from "zod";
 import { authorizeAdmin } from "@/server/admin-auth";
 import {
   brandedHtml,
-  canEmailClients,
   notifyAddress,
   sendEmail,
 } from "@/server/appointments/email";
 import {
   findAppointment,
   updateAppointmentStatus,
+  type AppointmentRecord,
 } from "@/server/appointments/repository";
 
 export const runtime = "nodejs";
@@ -44,17 +44,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Booking not found." }, { status: 404 });
   }
 
-  if (!canEmailClients()) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "Email to clients is not configured. Add GMAIL_USER and GMAIL_APP_PASSWORD (or a verified Resend domain), then try again.",
-      },
-      { status: 503 },
-    );
-  }
-
+  // 1. Attempt to send the customized email directly to the client:
   const emailSent = await sendEmail({
     to: appointment.email,
     subject: parsed.data.subject,
@@ -63,30 +53,44 @@ export async function POST(request: NextRequest) {
     replyTo: notifyAddress() ?? undefined,
   });
 
-  if (!emailSent) {
-    return NextResponse.json(
-      { ok: false, error: "The email could not be sent. The booking status was not changed." },
-      { status: 502 },
-    );
+  const status = parsed.data.decision === "approve" ? "confirmed" : "cancelled";
+  let updatedRecord: AppointmentRecord | null = null;
+  try {
+    updatedRecord = await updateAppointmentStatus(appointment.id, status);
+  } catch (error) {
+    console.error("Decision status update failed", error);
   }
 
-  const status = parsed.data.decision === "approve" ? "confirmed" : "cancelled";
-  try {
-    const record = await updateAppointmentStatus(appointment.id, status);
-    return NextResponse.json(
-      { ok: true, emailSent: true, appointment: record ?? { ...appointment, status } },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-  } catch (error) {
-    console.error("Decision status update failed after email was sent", error);
+  const finalRecord = updatedRecord ?? { ...appointment, status };
+
+  if (!emailSent) {
+    // If direct send to client failed (e.g. Resend sandbox restriction), send copy to admin for manual forwarding:
+    const adminTo = notifyAddress();
+    if (adminTo) {
+      const forwardSubject = `[Manual Forward Required] ${parsed.data.subject}`;
+      const forwardText = `Direct email delivery to ${appointment.email} was not accepted by the mail provider.\n\nPlease forward this ${parsed.data.decision === "approve" ? "approval" : "decline"} message directly to ${appointment.email}:\n\n---\nSubject: ${parsed.data.subject}\n\n${parsed.data.body}`;
+      await sendEmail({
+        to: adminTo,
+        subject: forwardSubject,
+        text: forwardText,
+        html: brandedHtml(forwardText, "Internal notice: Forward to client directly."),
+        replyTo: appointment.email,
+      });
+    }
+
     return NextResponse.json(
       {
         ok: true,
-        emailSent: true,
-        appointment: { ...appointment, status },
-        warning: "Email sent, but the status could not be saved. Refresh and set it manually.",
+        emailSent: false,
+        appointment: finalRecord,
+        warning: `Booking marked as ${status}. Client email could not be sent directly (Resend sandbox requires a verified domain or Gmail SMTP); a copy was sent to your admin inbox for manual forwarding.`,
       },
-      { status: 207 },
+      { status: 200, headers: { "Cache-Control": "no-store" } },
     );
   }
+
+  return NextResponse.json(
+    { ok: true, emailSent: true, appointment: finalRecord },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
