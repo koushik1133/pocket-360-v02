@@ -41,7 +41,7 @@ export function SiteFooter({
 
         <div className="site-footer__columns">
           <nav aria-label="Site navigation">
-            <p className="footer-label text-white/50">Explore</p>
+            <p className="footer-label text-white/75">Explore</p>
             {navigation.map((item) => (
               <Link key={item.label} href={item.href} className="hover:text-white transition-colors">
                 {item.label}
@@ -49,7 +49,7 @@ export function SiteFooter({
             ))}
           </nav>
           <div>
-            <p className="footer-label text-white/50">Connect</p>
+            <p className="footer-label text-white/75">Connect</p>
             <a href={brand.instagramUrl} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               Instagram
             </a>
@@ -62,9 +62,9 @@ export function SiteFooter({
             {contactPhone ? <a href={`tel:${contactPhone}`} className="hover:text-white transition-colors">{contactPhone}</a> : null}
           </div>
           <div>
-            <p className="footer-label text-white/50">Available in</p>
+            <p className="footer-label text-white/75">Available in</p>
             {brand.locations.map((location) => (
-              <span key={location} className="text-white/70 block py-0.5">{location}</span>
+              <span key={location} className="text-white/80 block py-0.5">{location}</span>
             ))}
           </div>
         </div>
@@ -78,12 +78,12 @@ export function SiteFooter({
       <div className="page-shell site-footer__bottom border-t border-white/10 pt-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-white/60">© {new Date().getFullYear()} Pocket Reels 360 · All rights reserved.</p>
-            <p className="text-[11px] text-white/40 mt-0.5">
+            <p className="text-xs text-white/80">© {new Date().getFullYear()} Pocket Reels 360 · All rights reserved.</p>
+            <p className="text-[11px] text-white/75 mt-0.5">
               Production Hubs: Dallas (HQ), NYC, Chicago, Charlotte · Shot on iPhone in 4K ProRes
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3.5 sm:gap-4 text-xs text-white/60">
+          <div className="flex flex-wrap items-center gap-3.5 sm:gap-4 text-xs text-white/75">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
             <Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link>

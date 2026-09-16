@@ -102,7 +102,7 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
         </div>
 
         <div
-          className="work-view-toggle hidden md:inline-flex p-1 rounded-full bg-paper border border-line"
+          className="work-view-toggle inline-flex p-1 rounded-full bg-paper border border-line"
           role="radiogroup"
           aria-label="Gallery view mode"
         >
@@ -136,16 +136,7 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
       </div>
 
       {/* Main Gallery Display */}
-      {/* Mobile view (< 768px): Always show the horizontal Rally Wall */}
-      <div className="block md:hidden w-full max-w-full overflow-hidden">
-        <RallyGallery
-          items={filtered.length > 0 ? filtered : items}
-          onSelectItem={handleSelectItem}
-        />
-      </div>
-
-      {/* Desktop view (>= 768px): Switchable between Rally Wall and Index Grid */}
-      <div className="hidden md:block w-full">
+      <div className="w-full max-w-full overflow-hidden">
         {viewMode === "rally" ? (
           <div className="rally-presentation-wrapper w-full max-w-full overflow-hidden">
             <RallyGallery

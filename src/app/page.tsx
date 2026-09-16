@@ -72,10 +72,10 @@ export default function HomePage() {
 
         <div className="hero__copy page-shell relative z-10">
           <div className="hero__content">
-            <p className="eyebrow" data-reveal>
+            <p className="eyebrow">
               Your viral reel-maker crew
             </p>
-            <div className="hero__title-wrap" data-reveal>
+            <div className="hero__title-wrap">
               <TextReveal
                 text="Your spotlight, in motion."
                 as="h1"
@@ -84,11 +84,11 @@ export default function HomePage() {
                 highlightClass="text-accent font-serif italic"
               />
             </div>
-            <p className="hero__lede mt-4" data-reveal>
+            <p className="hero__lede mt-4">
               Pocket Reels shoots on iPhone, edits, and delivers hassle-free
               social reels for events, brands, and creators.
             </p>
-            <div className="hero__actions mt-8 flex flex-wrap items-center gap-4" data-reveal>
+            <div className="hero__actions mt-8 flex flex-wrap items-center gap-4">
               <Magnetic strength={0.4}>
                 <Link className="button button--dark" href="/book">
                   Book an appointment
@@ -103,7 +103,7 @@ export default function HomePage() {
               </Magnetic>
             </div>
           </div>
-          <p className="hero__location" data-reveal>
+          <p className="hero__location">
             <MapPinIcon size={16} />
             {brand.locationLine}
           </p>
@@ -120,7 +120,7 @@ export default function HomePage() {
               alt="Intricate henna art on hand, captured in warm close-up"
               fill
               priority
-              sizes="(max-width: 800px) 50vw, 22vw"
+              sizes="(max-width: 768px) 45vw, (max-width: 1200px) 25vw, 360px"
             />
           </div>
           <div
@@ -133,7 +133,7 @@ export default function HomePage() {
               alt="Artist performing live on stage, crowd lit by dramatic spotlights"
               fill
               priority
-              sizes="(max-width: 800px) 50vw, 22vw"
+              sizes="(max-width: 768px) 45vw, (max-width: 1200px) 25vw, 360px"
             />
           </div>
           <div

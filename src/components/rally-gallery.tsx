@@ -90,10 +90,10 @@ export function RallyGallery({ items, onSelectItem }: RallyGalleryProps) {
       const shift = (rowIndex * 2) % len;
       const rotated = [...items.slice(shift), ...items.slice(0, shift)];
       let stream = [...rotated];
-      while (stream.length < 8) {
+      while (stream.length < 5) {
         stream = [...stream, ...rotated];
       }
-      return [...stream, ...stream, ...stream];
+      return [...stream, ...stream];
     });
   }, [items]);
 
@@ -225,9 +225,9 @@ export function RallyGallery({ items, onSelectItem }: RallyGalleryProps) {
                     <span className="text-[10px] md:text-[11px] font-semibold tracking-wider text-accent-soft uppercase">
                       {item.category}
                     </span>
-                    <h4 className="text-xs md:text-sm font-medium tracking-tight text-white line-clamp-1 mt-0.5">
+                    <p className="text-xs md:text-sm font-medium tracking-tight text-white line-clamp-1 mt-0.5">
                       {item.title}
-                    </h4>
+                    </p>
                   </div>
                 </button>
               ))}

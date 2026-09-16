@@ -27,6 +27,10 @@ const csp = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  compress: true,
+  experimental: {
+    optimizePackageImports: ["lenis", "three", "gsap"],
+  },
   turbopack: {
     root: process.cwd(),
   },
