@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { brand } from "@/content/site";
+import { env } from "@/env";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -89,7 +90,21 @@ export default function PrivacyPage() {
             <li><strong>&quot;Do Not Sell or Share My Information&quot;:</strong> Because we do not sell or share personal data with third parties for cross-context behavioral advertising, no opt-out is necessary.</li>
           </ul>
           <p className="mt-3">
-            To submit a privacy rights request, email us at <a href={`mailto:${brand.handle}`} className="text-accent underline">{brand.handle}</a> or reach out through our official Instagram channel.
+            To submit a privacy rights request,{" "}
+            {env.NEXT_PUBLIC_CONTACT_EMAIL ? (
+              <>
+                email us at{" "}
+                <a href={`mailto:${env.NEXT_PUBLIC_CONTACT_EMAIL}`} className="text-accent underline">
+                  {env.NEXT_PUBLIC_CONTACT_EMAIL}
+                </a>{" "}
+                or{" "}
+              </>
+            ) : null}
+            message us on our official Instagram channel{" "}
+            <a href={brand.instagramUrl} target="_blank" rel="noreferrer" className="text-accent underline">
+              {brand.handle}
+            </a>
+            .
           </p>
         </section>
 

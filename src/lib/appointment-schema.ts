@@ -6,6 +6,9 @@ const cleanText = (value: string) =>
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+/** Single source of truth for the package label used when none was sent. */
+export const DEFAULT_PACKAGE_TYPE = "Wedding & Reception Reels";
+
 export const appointmentSchema = z.object({
   service: z.string().default("reel-production"),
   packageType: z
@@ -13,7 +16,7 @@ export const appointmentSchema = z.object({
     .transform(cleanText)
     .pipe(z.string().min(1, "Select a package type").max(100))
     .optional()
-    .default("Wedding & Event Reels"),
+    .default(DEFAULT_PACKAGE_TYPE),
   date: z
     .string()
     .regex(datePattern, "Choose a valid date")

@@ -5,15 +5,15 @@ import gsap from "gsap";
 
 export function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
+  const visibleRef = useRef(false);
   const [label, setLabel] = useState<string>("");
   const [isActive, setIsActive] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Only enable on desktop with fine mouse pointer
+    // Only enable on desktop with a fine pointer; touch has no hover.
     const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     if (!canHover || prefersReduced) return;
 
     const cursor = cursorRef.current;
@@ -22,46 +22,44 @@ export function CustomCursor() {
     const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const mouse = { x: pos.x, y: pos.y };
 
+    const show = (visible: boolean) => {
+      if (visibleRef.current === visible) return;
+      visibleRef.current = visible;
+      setIsVisible(visible);
+    };
+
     const onMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
-      if (!isVisible) setIsVisible(true);
+      show(true);
     };
 
-    const onMouseLeave = () => {
-      setIsVisible(false);
-    };
+    const onMouseLeave = () => show(false);
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("mouseleave", onMouseLeave);
 
-    // Quick lerp loop with gsap ticker
     const updateCursor = () => {
       pos.x += (mouse.x - pos.x) * 0.18;
       pos.y += (mouse.y - pos.y) * 0.18;
-      if (cursor) {
-        gsap.set(cursor, {
-          x: pos.x,
-          y: pos.y,
-        });
-      }
+      gsap.set(cursor, { x: pos.x, y: pos.y });
     };
-
     gsap.ticker.add(updateCursor);
 
-    // Observer / delegate for [data-cursor]
+    // Event delegation for [data-cursor] hover labels.
+    let activeTarget: Element | null = null;
     const handleMouseOver = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest("[data-cursor]");
+      const target = (e.target as HTMLElement | null)?.closest("[data-cursor]") ?? null;
+      if (target === activeTarget) return;
+      activeTarget = target;
       if (target) {
-        const cursorText = target.getAttribute("data-cursor") || "VIEW";
-        setLabel(cursorText);
+        setLabel(target.getAttribute("data-cursor") || "VIEW");
         setIsActive(true);
       } else {
         setLabel("");
         setIsActive(false);
       }
     };
-
     document.addEventListener("mouseover", handleMouseOver, { passive: true });
 
     return () => {
@@ -70,7 +68,7 @@ export function CustomCursor() {
       document.removeEventListener("mouseover", handleMouseOver);
       gsap.ticker.remove(updateCursor);
     };
-  }, [isVisible]);
+  }, []);
 
   return (
     <div

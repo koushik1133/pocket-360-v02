@@ -20,6 +20,7 @@ import dynamic from "next/dynamic";
 import { WorkGallery } from "@/components/work-gallery";
 import { PinnedProcess } from "@/components/pinned-process";
 import { FeaturedSpotlight } from "@/components/featured-spotlight";
+import { Marquee } from "@/components/marquee";
 import { Magnetic } from "@/motion/magnetic";
 import { TextReveal } from "@/motion/text-reveal";
 import { emailUrl, whatsappUrl } from "@/lib/contact-links";
@@ -160,6 +161,9 @@ export default function HomePage() {
           Scroll
         </a>
       </section>
+
+      {/* ─── Ticker: what the crew does, where ─── */}
+      <Marquee />
 
       {/* ─── Journey Preview Section ─── */}
       <section id="journey" className="journey section-pad">

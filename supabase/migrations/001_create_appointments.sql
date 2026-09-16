@@ -1,6 +1,6 @@
 -- Supabase SQL migration: create appointments table
 -- Run this in your Supabase project's SQL editor:
--- https://gdeavawllxtdzgllryxf.supabase.co
+-- (Supabase dashboard -> SQL editor)
 
 create table if not exists public.appointments (
   id               uuid primary key default gen_random_uuid(),

@@ -1,35 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { env } from "@/env";
-import { listAppointments } from "@/server/appointments/repository";
+import {
+  ADMIN_COOKIE,
+  ADMIN_COOKIE_MAX_AGE,
+  authorizeAdmin,
+  isLockedOut,
+  pinMatches,
+  recordFailedAttempt,
+} from "@/server/admin-auth";
+import {
+  appointmentStatuses,
+  listAppointments,
+  updateAppointmentStatus,
+} from "@/server/appointments/repository";
+import { referenceCode } from "@/lib/email-templates";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function verifyAdminAuth(request: NextRequest): boolean {
-  const pinHeader = request.headers.get("x-admin-pin");
-  const authHeader = request.headers.get("authorization");
-  const bearerPin = authHeader?.startsWith("Bearer ")
-    ? authHeader.slice(7).trim()
-    : null;
-  const cookiePin = request.cookies.get("admin_pin")?.value;
+// ─── CSV ──────────────────────────────────────────────────────────────────────
 
-  const candidate = pinHeader || bearerPin || cookiePin;
-  return candidate === env.ADMIN_PASSWORD;
+function escapeCsv(value: string | undefined | null) {
+  const text = String(value ?? "").replace(/"/g, '""');
+  // Neutralise spreadsheet formula injection (=, +, -, @ at cell start).
+  const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+  return `"${safe}"`;
 }
 
+// ─── Handlers ─────────────────────────────────────────────────────────────────
+
 export async function GET(request: NextRequest) {
-  if (!verifyAdminAuth(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized. Invalid admin password." },
-      { status: 401, headers: { "Cache-Control": "no-store" } },
-    );
-  }
+  const auth = authorizeAdmin(request);
+  if (!auth.ok) return auth.response;
 
   const appointments = await listAppointments();
   const format = request.nextUrl.searchParams.get("format");
 
   if (format === "csv") {
     const headers = [
+      "Reference",
       "ID",
       "Created At",
       "Package / Service",
@@ -42,16 +52,12 @@ export async function GET(request: NextRequest) {
       "State",
       "City",
       "Venue",
-      "Project Details",
+      "Event Details",
       "Status",
     ];
 
-    const escapeCsv = (val: string | undefined | null) => {
-      const text = String(val ?? "").replace(/"/g, '""');
-      return `"${text}"`;
-    };
-
     const rows = appointments.map((apt) => [
+      escapeCsv(referenceCode(apt.id)),
       escapeCsv(apt.id),
       escapeCsv(apt.createdAt),
       escapeCsv(apt.packageType || apt.service),
@@ -89,24 +95,81 @@ export async function GET(request: NextRequest) {
   );
 }
 
+/** Exchange a PIN for an httpOnly session cookie. */
 export async function POST(request: NextRequest) {
+  const locked = isLockedOut(request);
+  if (locked) return locked;
+
   const body = (await request.json().catch(() => null)) as { pin?: string } | null;
   const pin = body?.pin?.trim();
 
-  if (pin === env.ADMIN_PASSWORD) {
+  if (pinMatches(pin)) {
     const response = NextResponse.json({ ok: true, message: "Authenticated" });
-    response.cookies.set("admin_pin", pin, {
+    response.cookies.set(ADMIN_COOKIE, env.ADMIN_PASSWORD, {
       httpOnly: true,
       secure: env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "strict",
+      maxAge: ADMIN_COOKIE_MAX_AGE,
       path: "/",
     });
     return response;
   }
 
+  const nowLocked = recordFailedAttempt(request);
+  if (nowLocked) return nowLocked;
+
   return NextResponse.json(
-    { ok: false, error: "Invalid password PIN. Please try again." },
+    { ok: false, error: "Incorrect PIN. Check with the crew lead for access." },
     { status: 401 },
   );
+}
+
+const statusUpdateSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(appointmentStatuses),
+});
+
+/** Update a booking's status without emailing the client. */
+export async function PATCH(request: NextRequest) {
+  const auth = authorizeAdmin(request);
+  if (!auth.ok) return auth.response;
+
+  const body: unknown = await request.json().catch(() => null);
+  const parsed = statusUpdateSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { ok: false, error: "Send a booking id and a valid status." },
+      { status: 422 },
+    );
+  }
+
+  try {
+    const record = await updateAppointmentStatus(
+      parsed.data.id,
+      parsed.data.status,
+    );
+    if (!record) {
+      return NextResponse.json(
+        { ok: false, error: "Booking not found." },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json(
+      { ok: true, appointment: record },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  } catch (error) {
+    console.error("Admin status update failed", error);
+    return NextResponse.json(
+      { ok: false, error: "The status could not be saved. Try again." },
+      { status: 500 },
+    );
+  }
+}
+
+/** Log out: clear the session cookie. */
+export async function DELETE() {
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set(ADMIN_COOKIE, "", { maxAge: 0, path: "/" });
+  return response;
 }

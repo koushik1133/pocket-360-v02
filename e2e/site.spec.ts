@@ -73,8 +73,16 @@ test("appointment validation and submission work end to end", async ({ page }) =
     .fill("End-to-end booking verification.");
   await continueBtn.click();
 
-  // Step 5: Review & Submit
-  await page.getByRole("button", { name: "Confirm appointment" }).click();
+  // Step 5: Review & Submit — consent is required and never pre-checked
+  const confirmBtn = page.getByRole("button", { name: "Confirm appointment" });
+  await confirmBtn.click();
+  await expect(
+    page.getByText("Confirm you are 18 or older to continue.", { exact: true }),
+  ).toBeVisible();
+
+  await page.getByLabel(/at least 18 years of age/i).check();
+  await page.getByLabel(/I agree to the/i).check();
+  await confirmBtn.click();
 
   await expect(
     page.getByRole("heading", { name: "You're all set." }),
@@ -232,7 +240,7 @@ test("admin dashboard requires PIN 9912 and shows enquiries table", async ({
   const pinInput = page.getByLabel("Access PIN / Password");
   await pinInput.fill("0000");
   await page.getByRole("button", { name: "Unlock Dashboard" }).click();
-  await expect(page.getByText(/Incorrect password PIN/i)).toBeVisible();
+  await expect(page.getByText(/Incorrect PIN/i)).toBeVisible();
 
   // Test valid PIN 9912
   await pinInput.fill("9912");
@@ -243,6 +251,67 @@ test("admin dashboard requires PIN 9912 and shows enquiries table", async ({
   ).toBeVisible({ timeout: 10000 });
   await expect(page.getByRole("button", { name: "Export CSV" })).toBeVisible();
   await expect(page.getByPlaceholder(/Search by client/i)).toBeVisible();
+});
+
+test("admin API rejects unauthenticated status updates and accepts valid ones", async ({
+  request,
+}) => {
+  const denied = await request.patch("/api/admin/appointments", {
+    data: { id: crypto.randomUUID(), status: "confirmed" },
+  });
+  expect(denied.status()).toBe(401);
+
+  const list = await request.get("/api/admin/appointments", {
+    headers: { "x-admin-pin": "9912" },
+  });
+  expect(list.status()).toBe(200);
+  const body = (await list.json()) as {
+    appointments: { id: string; status: string }[];
+  };
+  const target = body.appointments[0];
+  if (!target) return; // nothing to update in an empty store
+
+  const updated = await request.patch("/api/admin/appointments", {
+    headers: { "x-admin-pin": "9912" },
+    data: { id: target.id, status: target.status },
+  });
+  expect(updated.status()).toBe(200);
+
+  const csv = await request.get("/api/admin/appointments?format=csv", {
+    headers: { "x-admin-pin": "9912" },
+  });
+  expect(csv.status()).toBe(200);
+  expect(csv.headers()["content-type"]).toContain("text/csv");
+
+  // Decision endpoint: rejects bad input, and either sends (200/207) or
+  // refuses honestly when no client-capable email transport is configured (503).
+  const badDecision = await request.post("/api/admin/appointments/decision", {
+    headers: { "x-admin-pin": "9912" },
+    data: { id: target.id, decision: "approve", subject: "x", body: "short" },
+  });
+  expect(badDecision.status()).toBe(422);
+
+  const status = await request.get("/api/admin/status", {
+    headers: { "x-admin-pin": "9912" },
+  });
+  expect(status.status()).toBe(200);
+  const system = (await status.json()) as {
+    email: { canEmailClients: boolean };
+    storage: { kind: string };
+  };
+  expect(["supabase", "postgres", "local-file"]).toContain(system.storage.kind);
+  if (!system.email.canEmailClients) {
+    const refused = await request.post("/api/admin/appointments/decision", {
+      headers: { "x-admin-pin": "9912" },
+      data: {
+        id: target.id,
+        decision: "deny",
+        subject: "About your booking",
+        body: "Unfortunately we cannot take this booking right now.",
+      },
+    });
+    expect(refused.status()).toBe(503);
+  }
 });
 
 

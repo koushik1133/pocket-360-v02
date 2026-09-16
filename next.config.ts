@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
-const scriptPolicy = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+// Turbopack's dev runtime needs eval; production bundles do not. Keeping
+// 'unsafe-eval' out of the production policy closes the most common CSP gap.
+const isDev = process.env.NODE_ENV !== "production";
+const scriptPolicy = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
 
 const connectPolicy =
   "connect-src 'self' ws: wss: https://*.supabase.co wss://*.supabase.co https://api.resend.com https://api.groq.com";
@@ -23,6 +28,8 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // The Dockerfile copies .next/standalone; without this the image build fails.
+  output: "standalone",
   experimental: {
     optimizePackageImports: ["lenis", "three", "gsap"],
   },
@@ -43,7 +50,6 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
           { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
           {

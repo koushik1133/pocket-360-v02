@@ -82,9 +82,9 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
   return (
     <div className="work-gallery-root">
       {/* Gallery Controls: Category Filters & Presentation Toggle */}
-      <div className="work-controls flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div className="work-controls flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div
-          className="work-filters"
+          className="work-filters flex-wrap"
           aria-label="Filter by category"
           role="group"
         >
@@ -102,17 +102,13 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
         </div>
 
         <div
-          className="work-view-toggle inline-flex p-1 rounded-full bg-paper border border-line"
+          className="work-view-toggle self-end sm:self-auto"
           role="radiogroup"
           aria-label="Gallery view mode"
         >
           <button
             type="button"
-            className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
-              viewMode === "grid"
-                ? "is-active"
-                : "text-muted hover:text-ink"
-            }`}
+            className={viewMode === "grid" ? "is-active" : ""}
             onClick={() => setViewMode("grid")}
             aria-checked={viewMode === "grid"}
             role="radio"
@@ -121,11 +117,7 @@ export function WorkGallery({ items }: { items: readonly WorkItem[] }) {
           </button>
           <button
             type="button"
-            className={`px-4 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 ${
-              viewMode === "rally"
-                ? "is-active"
-                : "text-muted hover:text-ink"
-            }`}
+            className={viewMode === "rally" ? "is-active" : ""}
             onClick={() => setViewMode("rally")}
             aria-checked={viewMode === "rally"}
             role="radio"

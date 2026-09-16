@@ -85,9 +85,13 @@ export function TextReveal({
         className="text-reveal-inner inline-flex flex-wrap gap-x-[0.3em] gap-y-[0.15em] overflow-visible py-1"
       >
         {words.map((word, i) => {
-          const isHighlight = highlightWords.some(
-            (hw) => word.toLowerCase().includes(hw.toLowerCase()),
-          );
+          // Exact match (ignoring trailing punctuation) so "in" never
+          // accidentally highlights "Instagram" or "moving".
+          const bare = word.toLowerCase().replace(/[.,!?;:]+$/, "");
+          const isHighlight = highlightWords.some((hw) => {
+            const target = hw.toLowerCase().replace(/[.,!?;:]+$/, "");
+            return bare === target;
+          });
           return (
             <span
               key={`${word}-${i}`}

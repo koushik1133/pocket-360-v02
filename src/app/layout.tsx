@@ -9,6 +9,9 @@ import { SiteMotion } from "@/components/site-motion";
 import { LenisProvider } from "@/motion/lenis-provider";
 import { CustomCursor } from "@/motion/custom-cursor";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { ScrollProgress } from "@/components/scroll-progress";
+import { SiteChrome } from "@/components/site-chrome";
+import { sans, serif } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -95,8 +98,14 @@ const structuredData = {
       image: `${env.NEXT_PUBLIC_SITE_URL}/opengraph-image`,
       description: brand.description,
       priceRange: "$$",
-      telephone: env.NEXT_PUBLIC_CONTACT_PHONE || "+1-469-555-0199",
-      email: env.NEXT_PUBLIC_CONTACT_EMAIL || "koushik.lf38@gmail.com",
+      // Only publish contact details that are actually configured. Placeholder
+      // numbers in structured data get indexed by search engines.
+      ...(env.NEXT_PUBLIC_CONTACT_PHONE
+        ? { telephone: env.NEXT_PUBLIC_CONTACT_PHONE }
+        : {}),
+      ...(env.NEXT_PUBLIC_CONTACT_EMAIL
+        ? { email: env.NEXT_PUBLIC_CONTACT_EMAIL }
+        : {}),
       sameAs: [brand.instagramUrl, brand.youtubeUrl],
       address: {
         "@type": "PostalAddress",
@@ -175,23 +184,35 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
         <LenisProvider>
-          <CustomCursor />
-          <SiteHeader />
-          <main id="main-content">{children}</main>
-          <SiteFooter {...contact} />
-          <MobileActionBar whatsappNumber={contact.whatsappNumber} />
-          <AssistantWidget
-            whatsappNumber={contact.whatsappNumber}
-            contactEmail={contact.contactEmail}
-            contactPhone={contact.contactPhone}
-          />
-          <CookieConsentBanner />
+          <SiteChrome
+            before={
+              <>
+                <CustomCursor />
+                <SiteHeader />
+                <ScrollProgress />
+              </>
+            }
+            after={
+              <>
+                <SiteFooter {...contact} />
+                <MobileActionBar whatsappNumber={contact.whatsappNumber} />
+                <AssistantWidget
+                  whatsappNumber={contact.whatsappNumber}
+                  contactEmail={contact.contactEmail}
+                  contactPhone={contact.contactPhone}
+                />
+                <CookieConsentBanner />
+              </>
+            }
+          >
+            <main id="main-content">{children}</main>
+          </SiteChrome>
           <SiteMotion />
         </LenisProvider>
         <script

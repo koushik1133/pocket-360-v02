@@ -58,6 +58,10 @@ const schema = z.object({
     .string()
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
+  SUPABASE_SERVICE_ROLE_KEY: z
+    .string()
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : undefined)),
   ALLOW_FILE_APPOINTMENTS: z
     .string()
     .optional()
@@ -71,13 +75,18 @@ const schema = z.object({
     .string()
     .optional()
     .transform((value) => (value && value.length > 0 ? value : undefined)),
-  ANTHROPIC_API_KEY: z
+  ASSISTANT_MODEL: z.string().min(1).default("openai/gpt-oss-120b"),
+  GMAIL_USER: optionalEmail,
+  GMAIL_APP_PASSWORD: z
     .string()
     .optional()
-    .transform((value) => (value && value.length > 0 ? value : undefined)),
-  ASSISTANT_MODEL: z.string().min(1).default("openai/gpt-oss-120b"),
+    .transform((value) => {
+      // Google shows app passwords as "abcd efgh ijkl mnop"; strip the spaces.
+      const compact = value?.replace(/\s+/g, "");
+      return compact && compact.length > 0 ? compact : undefined;
+    }),
   APPOINTMENT_FROM_EMAIL: optionalEmail.default("onboarding@resend.dev"),
-  APPOINTMENT_NOTIFY_EMAIL: optionalEmail.default("koushik.lf38@gmail.com"),
+  APPOINTMENT_NOTIFY_EMAIL: optionalEmail,
   APPOINTMENT_FROM_NAME: z.string().min(1).default("Pocket Reels 360"),
   ADMIN_PASSWORD: z.string().min(1).default("9912"),
   NEXT_PUBLIC_WHATSAPP_NUMBER: z
@@ -101,11 +110,15 @@ const parsed = schema.safeParse({
   DATABASE_URL: blankToUndefined(process.env.DATABASE_URL),
   NEXT_PUBLIC_SUPABASE_URL: blankToUndefined(process.env.NEXT_PUBLIC_SUPABASE_URL),
   SUPABASE_ANON_KEY: blankToUndefined(process.env.SUPABASE_ANON_KEY),
+  SUPABASE_SERVICE_ROLE_KEY: blankToUndefined(
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+  ),
   ALLOW_FILE_APPOINTMENTS: blankToUndefined(process.env.ALLOW_FILE_APPOINTMENTS),
   RESEND_API_KEY: blankToUndefined(process.env.RESEND_API_KEY),
   GROQ_API_KEY: blankToUndefined(process.env.GROQ_API_KEY),
-  ANTHROPIC_API_KEY: blankToUndefined(process.env.ANTHROPIC_API_KEY),
   ASSISTANT_MODEL: blankToUndefined(process.env.ASSISTANT_MODEL),
+  GMAIL_USER: blankToUndefined(process.env.GMAIL_USER),
+  GMAIL_APP_PASSWORD: blankToUndefined(process.env.GMAIL_APP_PASSWORD),
   APPOINTMENT_FROM_EMAIL: blankToUndefined(
     process.env.APPOINTMENT_FROM_EMAIL || process.env.RESEND_FROM_EMAIL,
   ),

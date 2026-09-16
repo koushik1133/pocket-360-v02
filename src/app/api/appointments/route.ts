@@ -8,53 +8,16 @@ import {
   createAppointment,
 } from "@/server/appointments/repository";
 import { sendAppointmentEmails } from "@/server/appointments/email";
+import { clientKey, createRateLimiter, problem } from "@/server/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const RATE_LIMIT = 5;
-
-type RateEntry = { count: number; expiresAt: number };
-const globalRateState = globalThis as typeof globalThis & {
-  appointmentRateLimits?: Map<string, RateEntry>;
-};
-const rateLimits =
-  globalRateState.appointmentRateLimits ??
-  (globalRateState.appointmentRateLimits = new Map());
-
-function clientKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "local"
-  );
-}
-
-function consumeRateLimit(key: string) {
-  const now = Date.now();
-  if (rateLimits.size > 10_000) {
-    for (const [storedKey, stored] of rateLimits) {
-      if (stored.expiresAt <= now) rateLimits.delete(storedKey);
-    }
-  }
-  const entry = rateLimits.get(key);
-  if (!entry || entry.expiresAt <= now) {
-    rateLimits.set(key, { count: 1, expiresAt: now + RATE_WINDOW_MS });
-    return { allowed: true, remaining: RATE_LIMIT - 1 };
-  }
-
-  if (entry.count >= RATE_LIMIT) {
-    return {
-      allowed: false,
-      remaining: 0,
-      retryAfter: Math.ceil((entry.expiresAt - now) / 1000),
-    };
-  }
-
-  entry.count += 1;
-  return { allowed: true, remaining: RATE_LIMIT - entry.count };
-}
+const limiter = createRateLimiter({
+  name: "appointments",
+  limit: 5,
+  windowMs: 10 * 60 * 1000,
+});
 
 function sameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
@@ -69,32 +32,6 @@ function sameOrigin(request: NextRequest) {
   } catch {
     return false;
   }
-}
-
-function problem(
-  status: number,
-  title: string,
-  detail: string,
-  requestId: string,
-  extra?: Record<string, unknown>,
-) {
-  return Response.json(
-    {
-      type: "about:blank",
-      title,
-      status,
-      detail,
-      requestId,
-      ...extra,
-    },
-    {
-      status,
-      headers: {
-        "Content-Type": "application/problem+json",
-        "Cache-Control": "no-store",
-      },
-    },
-  );
 }
 
 export async function POST(request: NextRequest) {
@@ -123,29 +60,22 @@ export async function POST(request: NextRequest) {
     return problem(
       413,
       "Request too large",
-      "Keep project details under 2,000 characters.",
+      "Keep event details under 3,000 characters.",
       requestId,
     );
   }
 
-  const rate = consumeRateLimit(clientKey(request));
+  const rate = limiter.consume(clientKey(request));
   if (!rate.allowed) {
-    return Response.json(
+    return problem(
+      429,
+      "Too many requests",
+      "Please wait a few minutes before trying again.",
+      requestId,
+      undefined,
       {
-        type: "about:blank",
-        title: "Too many requests",
-        status: 429,
-        detail: "Please wait a few minutes before trying again.",
-        requestId,
-      },
-      {
-        status: 429,
-        headers: {
-          "Content-Type": "application/problem+json",
-          "Cache-Control": "no-store",
-          "Retry-After": String(rate.retryAfter),
-          "X-RateLimit-Remaining": "0",
-        },
+        "Retry-After": String(rate.retryAfter),
+        "X-RateLimit-Remaining": "0",
       },
     );
   }
@@ -155,7 +85,7 @@ export async function POST(request: NextRequest) {
     return problem(
       413,
       "Request too large",
-      "Keep project details under 2,000 characters.",
+      "Keep event details under 3,000 characters.",
       requestId,
     );
   }

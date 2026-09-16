@@ -32,10 +32,17 @@ not publish those values unless an owner supplies them through configuration.
 - `phone`
 - `email`
 - `project_details`
+- `package_type`
+- `preferred_time_to_call`
+- `country`, `state`, `city`, `location_venue`
+- `event_details`
 - `status`: pending, confirmed, cancelled, completed
 - `idempotency_key`
 - `created_at`
 - `updated_at`
+
+Storage priority is Supabase, then direct PostgreSQL, then the local JSON
+file. All three share one row mapping in `src/server/appointments/repository.ts`.
 
 The partial unique index on service, date, and time prevents duplicate pending
 or confirmed requests. The idempotency key makes a network retry safe.
@@ -53,7 +60,11 @@ Provider and database secrets are never exposed through `NEXT_PUBLIC_*`.
 - `/book` — static shell with the client-side six-step booking flow
 - `/privacy` and `/terms` — public policy pages
 - `/api/appointments` — dynamic Node.js appointment mutation
+- `/api/admin/appointments` — PIN-protected list, CSV export, status update
+  (`PATCH`), session cookie login (`POST`) and logout (`DELETE`)
+- `/api/assistant` — Groq-first, Anthropic-fallback concierge chat
 - `/api/health` — dynamic storage readiness check
+- `/admin` — crew bookings portal, rendered without the marketing chrome
 - `/robots.txt`, `/sitemap.xml`, `/opengraph-image` — generated SEO assets
 
 ## Appointment flow

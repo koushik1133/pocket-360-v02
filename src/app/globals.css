@@ -16,6 +16,12 @@
   --color-assistant-red-glow: rgba(158, 8, 20, 0.4);
   --color-positive: #188038;
   --color-error: #d93025;
+  --font-sans:
+    var(--font-sans-next, "Manrope"), "Avenir Next", Avenir, "Helvetica Neue",
+    Helvetica, Arial, sans-serif;
+  --font-serif:
+    var(--font-serif-next, "Instrument Serif"), "Iowan Old Style", Baskerville,
+    "Times New Roman", serif;
 }
 
 :root {
@@ -70,8 +76,8 @@ body {
   overflow-x: hidden;
   background: var(--color-ivory);
   color: var(--color-ink);
-  font-family:
-    "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
+  font-optical-sizing: auto;
   font-size: 1rem;
   line-height: 1.6;
   text-rendering: optimizeLegibility;
@@ -537,11 +543,14 @@ h3 {
   padding-bottom: 0.1em;
 }
 
+/* Tailwind's @theme --font-serif token already generates .font-serif; these
+   two headings use a bare <em> so they get the face and colour here. */
 .hero h1 em,
 .contact h2 em {
   color: var(--color-accent-dark);
-  font-family: "Iowan Old Style", Baskerville, "Times New Roman", serif;
+  font-family: var(--font-serif);
   font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .hero__lede {
@@ -1010,7 +1019,7 @@ h3 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: 0;
 }
 
 .work-filters button {
@@ -1044,22 +1053,26 @@ h3 {
 }
 
 .work-view-toggle {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .work-view-toggle {
-    display: inline-flex;
-  }
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-paper, #fbf7f2);
+  border: 1px solid var(--color-line, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .work-view-toggle button {
   cursor: pointer;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.75rem;
   font-weight: 600;
   border-radius: 999px;
   border: 1px solid transparent;
-  color: var(--color-ink-soft);
+  color: var(--color-ink-soft, #524d47);
+  background: transparent;
   transition: all 180ms var(--ease-out);
+  white-space: nowrap;
 }
 
 .work-view-toggle button:hover:not(.is-active):not([aria-checked="true"]) {
@@ -2601,7 +2614,9 @@ h3 {
   }
 
   .hero h1 {
-    font-size: clamp(3.7rem, 12vw, 7rem);
+    font-size: clamp(2.75rem, 8vw, 5.5rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .hero__location {
@@ -2736,7 +2751,9 @@ h3 {
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 15vw, 5rem);
+    font-size: clamp(2.15rem, 9.5vw, 3.8rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .hero__actions {
@@ -3094,7 +3111,9 @@ h3 {
   }
 
   .hero h1 {
-    font-size: 3.25rem;
+    font-size: clamp(1.85rem, 8vw, 2.25rem);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .highlight-row > div {
@@ -3998,3 +4017,182 @@ body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2026 UPSCALE — ticker, reading progress, film grain, admin controls
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── HERO TICKER ─── */
+.marquee {
+  --marquee-duration: 38s;
+  position: relative;
+  z-index: 6;
+  overflow: hidden;
+  border-block: 1px solid var(--color-line);
+  background: var(--color-ink);
+  color: var(--color-white);
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  padding-block: 0.85rem;
+  animation: marquee-scroll var(--marquee-duration) linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding-inline: 0.8rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee__dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  box-shadow: 0 0 12px oklch(0.57 0.22 26 / 0.7);
+}
+
+@keyframes marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+  .marquee__item[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+/* ─── READING PROGRESS ─── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 101;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* ─── FILM GRAIN on dark cinematic sections ─── */
+.reels,
+.instagram-cta,
+.site-footer,
+.curved-dial-section {
+  position: relative;
+  isolation: isolate;
+}
+
+.reels::before,
+.instagram-cta::before,
+.site-footer::before,
+.curved-dial-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ─── HERO PANEL: red lens-flare edge on hover ─── */
+.hero__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(135deg, oklch(0.57 0.22 26 / 0.35), transparent 55%);
+  transition: opacity 400ms var(--ease-out);
+}
+
+.hero__panel:hover::before {
+  opacity: 1;
+}
+
+/* ─── BUTTON: sheen sweep ─── */
+.button--dark,
+.button--light {
+  position: relative;
+  overflow: hidden;
+}
+
+.button--dark::after,
+.button--light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, oklch(1 0 0 / 0.18) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 600ms var(--ease-out);
+  pointer-events: none;
+}
+
+.button--dark:hover::after,
+.button--light:hover::after {
+  transform: translateX(120%);
+}
+
+/* ─── ADMIN: inline status select ─── */
+.admin-status-select {
+  appearance: none;
+  padding: 0.3rem 1.6rem 0.3rem 0.65rem;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23fff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+}
+
+.admin-status-select:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.admin-status-select option {
+  background: #181615;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress,
+  .hero__panel::before,
+  .button--dark::after,
+  .button--light::after {
+    transition: none;
+  }
+}

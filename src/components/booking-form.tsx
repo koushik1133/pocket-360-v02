@@ -77,6 +77,8 @@ export type BookingFields = {
   eventDetails: string;
   projectDetails: string;
   website: string;
+  ageConfirmed: boolean;
+  termsAccepted: boolean;
 };
 
 type FieldErrors = Partial<Record<keyof BookingFields, string>>;
@@ -117,7 +119,17 @@ const initialFields: BookingFields = {
   eventDetails: "",
   projectDetails: "",
   website: "",
+  ageConfirmed: false,
+  termsAccepted: false,
 };
+
+/** Consent flags are validated client-side only; the API schema does not accept them. */
+function submittableFields(fields: BookingFields) {
+  const copy: Partial<BookingFields> = { ...fields };
+  delete copy.ageConfirmed;
+  delete copy.termsAccepted;
+  return copy as Omit<BookingFields, "ageConfirmed" | "termsAccepted">;
+}
 
 function localDateInput(date: Date) {
   const year = date.getFullYear();
@@ -183,6 +195,16 @@ function validateStep(step: number, fields: BookingFields): FieldErrors {
     }
     if (fields.projectDetails.length > 3000) {
       errors.projectDetails = "Keep project details under 3,000 characters.";
+    }
+  }
+
+  if (step === 5) {
+    // Consent must be an affirmative action: never pre-checked, always validated.
+    if (!fields.ageConfirmed) {
+      errors.ageConfirmed = "Confirm you are 18 or older to continue.";
+    }
+    if (!fields.termsAccepted) {
+      errors.termsAccepted = "Accept the Terms of Service and Privacy Policy to continue.";
     }
   }
 
@@ -288,8 +310,12 @@ export function BookingForm({
     setFields((current) => {
       const next = { ...current, [key]: value };
       // Keep eventDetails and projectDetails in sync for backwards compatibility
-      if (key === "eventDetails") next.projectDetails = value;
-      if (key === "projectDetails") next.eventDetails = value;
+      if (key === "eventDetails" && typeof value === "string") {
+        next.projectDetails = value;
+      }
+      if (key === "projectDetails" && typeof value === "string") {
+        next.eventDetails = value;
+      }
       return next;
     });
     setErrors((current) => ({ ...current, [key]: undefined }));
@@ -322,6 +348,7 @@ export function BookingForm({
       ...validateStep(2, fields),
       ...validateStep(3, fields),
       ...validateStep(4, fields),
+      ...validateStep(5, fields),
     };
     if (Object.keys(finalErrors).length > 0) {
       setErrors(finalErrors);
@@ -333,7 +360,9 @@ export function BookingForm({
             ? 2
             : finalErrors.name || finalErrors.phone || finalErrors.email
               ? 3
-              : 4;
+              : finalErrors.eventDetails || finalErrors.projectDetails
+                ? 4
+                : 5;
       setStep(firstStep);
       focusFirstError();
       return;
@@ -345,7 +374,7 @@ export function BookingForm({
 
     try {
       const payload = {
-        ...fields,
+        ...submittableFields(fields),
         service: "reel-production",
         projectDetails: fields.eventDetails || fields.projectDetails || "Enquiry submission",
         idempotencyKey: idempotencyKey.current,
@@ -914,19 +943,30 @@ export function BookingForm({
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
-                    required
-                    defaultChecked
+                    name="ageConfirmed"
+                    checked={fields.ageConfirmed}
+                    onChange={(e) => update("ageConfirmed", e.target.checked)}
+                    aria-invalid={Boolean(errors.ageConfirmed)}
+                    aria-describedby={errors.ageConfirmed ? "age-error" : undefined}
                     className="mt-0.5 rounded border-line text-accent focus:ring-accent accent-accent w-4 h-4"
                   />
                   <span>
                     I confirm that I am at least 18 years of age and authorized to book services for this event.
                   </span>
                 </label>
+                {errors.ageConfirmed ? (
+                  <span id="age-error" className="field__error">
+                    {errors.ageConfirmed}
+                  </span>
+                ) : null}
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
                     type="checkbox"
-                    required
-                    defaultChecked
+                    name="termsAccepted"
+                    checked={fields.termsAccepted}
+                    onChange={(e) => update("termsAccepted", e.target.checked)}
+                    aria-invalid={Boolean(errors.termsAccepted)}
+                    aria-describedby={errors.termsAccepted ? "terms-error" : undefined}
                     className="mt-0.5 rounded border-line text-accent focus:ring-accent accent-accent w-4 h-4"
                   />
                   <span>
@@ -941,6 +981,11 @@ export function BookingForm({
                     . Pocket Reels 360 may contact me via email or phone regarding this booking inquiry.
                   </span>
                 </label>
+                {errors.termsAccepted ? (
+                  <span id="terms-error" className="field__error">
+                    {errors.termsAccepted}
+                  </span>
+                ) : null}
               </div>
 
               <p className="booking-summary__note mt-3 text-[11px] text-muted">
