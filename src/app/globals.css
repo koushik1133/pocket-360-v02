@@ -3876,6 +3876,63 @@ body:has([aria-label="Cookie and Privacy Choices"]) .assistant-launcher {
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 60% 40%, oklch(0.57 0.22 26 / 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ─── CSS Floating Red Flakes ─────────────────────────────────────────────── */
+/* Visible on ALL devices (desktop WebGL + CSS overlay, mobile CSS only).      */
+
+.hero-css-flakes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-flake {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-accent);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation:
+    flake-drift var(--flake-dur, 7s) var(--flake-delay, 0s) ease-in-out infinite,
+    flake-sway  calc(var(--flake-dur, 7s) * 0.6) var(--flake-delay, 0s) ease-in-out infinite alternate;
+}
+
+@keyframes flake-drift {
+  0%   { transform: translateY(0)       translateX(0);    opacity: 0;                       }
+  8%   { opacity: var(--flake-opacity, 0.45); }
+  90%  { opacity: var(--flake-opacity, 0.45); }
+  100% { transform: translateY(-110vh)  translateX(var(--flake-sway, 0px)); opacity: 0; }
+}
+
+@keyframes flake-sway {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(var(--flake-sway, 20px)); }
+}
+
+/* Individual flake placements — spread across the full hero width */
+.hero-flake--1  { --flake-dur: 9.2s;  --flake-delay: 0s;    --flake-opacity: 0.50; --flake-sway:  18px; width: 6px;  height: 6px;  left: 8%;   bottom: -6px; }
+.hero-flake--2  { --flake-dur: 7.4s;  --flake-delay: 1.1s;  --flake-opacity: 0.35; --flake-sway: -24px; width: 4px;  height: 4px;  left: 17%;  bottom: -4px; }
+.hero-flake--3  { --flake-dur: 11.8s; --flake-delay: 0.4s;  --flake-opacity: 0.45; --flake-sway:  30px; width: 8px;  height: 8px;  left: 26%;  bottom: -8px; }
+.hero-flake--4  { --flake-dur: 8.6s;  --flake-delay: 2.3s;  --flake-opacity: 0.30; --flake-sway: -16px; width: 3px;  height: 3px;  left: 35%;  bottom: -3px; }
+.hero-flake--5  { --flake-dur: 10.3s; --flake-delay: 0.8s;  --flake-opacity: 0.55; --flake-sway:  22px; width: 7px;  height: 7px;  left: 44%;  bottom: -7px; }
+.hero-flake--6  { --flake-dur: 6.9s;  --flake-delay: 3.5s;  --flake-opacity: 0.40; --flake-sway: -28px; width: 5px;  height: 5px;  left: 55%;  bottom: -5px; }
+.hero-flake--7  { --flake-dur: 13.1s; --flake-delay: 1.7s;  --flake-opacity: 0.35; --flake-sway:  14px; width: 4px;  height: 4px;  left: 63%;  bottom: -4px; }
+.hero-flake--8  { --flake-dur: 8.0s;  --flake-delay: 0.2s;  --flake-opacity: 0.60; --flake-sway: -20px; width: 9px;  height: 9px;  left: 72%;  bottom: -9px; }
+.hero-flake--9  { --flake-dur: 9.8s;  --flake-delay: 4.0s;  --flake-opacity: 0.30; --flake-sway:  26px; width: 3px;  height: 3px;  left: 80%;  bottom: -3px; }
+.hero-flake--10 { --flake-dur: 7.2s;  --flake-delay: 2.8s;  --flake-opacity: 0.48; --flake-sway: -18px; width: 6px;  height: 6px;  left: 88%;  bottom: -6px; }
+.hero-flake--11 { --flake-dur: 12.4s; --flake-delay: 1.4s;  --flake-opacity: 0.40; --flake-sway:  32px; width: 5px;  height: 5px;  left: 5%;   bottom: -5px; }
+.hero-flake--12 { --flake-dur: 8.8s;  --flake-delay: 3.1s;  --flake-opacity: 0.55; --flake-sway: -12px; width: 7px;  height: 7px;  left: 93%;  bottom: -7px; }
+.hero-flake--13 { --flake-dur: 10.6s; --flake-delay: 0.6s;  --flake-opacity: 0.32; --flake-sway:  20px; width: 4px;  height: 4px;  left: 48%;  bottom: -4px; }
+.hero-flake--14 { --flake-dur: 7.8s;  --flake-delay: 2.0s;  --flake-opacity: 0.50; --flake-sway: -22px; width: 6px;  height: 6px;  left: 21%;  bottom: -6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-flake {
+    animation: none !important;
+    opacity: 0 !important;
+  }
 }
 
 /* ─── KEYFRAME ANIMATIONS ─── */
